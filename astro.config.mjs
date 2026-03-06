@@ -9,6 +9,11 @@ export default defineConfig({
   site: 'https://kataloggue.my.id',
   adapter: node({ mode: 'standalone' }),
   integrations: [react()],
+  // Disable Astro's origin check - we're behind Caddy reverse proxy
+  // CSRF protection provided by SameSite=Lax cookies + JWT auth
+  security: {
+    checkOrigin: false,
+  },
   vite: {
     plugins: [tailwindcss()],
   },
