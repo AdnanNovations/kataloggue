@@ -125,6 +125,46 @@ export default function CatalogPreview({ style: s, storeName }: CatalogPreviewPr
           ))}
         </div>
 
+        {/* Review Section */}
+        <div className="px-4 pb-3">
+          <div
+            className="rounded-lg p-3"
+            style={{
+              backgroundColor: s.reviewBg,
+              border: `1px solid ${s.reviewBorder}`,
+            }}
+          >
+            <div className="text-[10px] font-bold mb-2" style={{ color: s.reviewText }}>
+              Tulis Ulasan
+            </div>
+            <div
+              className="rounded px-2 py-1.5 text-[9px] mb-1.5"
+              style={{ backgroundColor: s.reviewInputBg, color: s.reviewSubtext }}
+            >
+              Nama Anda
+            </div>
+            <div className="flex gap-0.5 mb-1.5">
+              {[1, 2, 3, 4, 5].map((i) => (
+                <svg key={i} className="w-2.5 h-2.5" viewBox="0 0 24 24" fill={i <= 4 ? '#fbbf24' : 'none'} stroke={i <= 4 ? '#fbbf24' : '#d1d5db'} strokeWidth="2">
+                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                </svg>
+              ))}
+            </div>
+            <div
+              className="rounded px-2 py-2 text-[9px] mb-2"
+              style={{ backgroundColor: s.reviewInputBg, color: s.reviewSubtext }}
+            >
+              Komentar...
+            </div>
+            <div
+              className="rounded py-1 text-center text-[9px] font-medium text-white"
+              style={{ backgroundColor: s.accentColor }}
+            >
+              Kirim Ulasan
+            </div>
+          </div>
+        </div>
+
         {/* Footer */}
         <div
           className="text-center py-3 text-[10px]"

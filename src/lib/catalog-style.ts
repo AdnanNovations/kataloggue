@@ -30,6 +30,12 @@ export interface CatalogStyle {
   footerBg: string;
   footerText: string;
   footerBorder: string;
+
+  reviewBg: string;
+  reviewBorder: string;
+  reviewText: string;
+  reviewSubtext: string;
+  reviewInputBg: string;
 }
 
 export const DEFAULT_CATALOG_STYLE: CatalogStyle = {
@@ -62,6 +68,12 @@ export const DEFAULT_CATALOG_STYLE: CatalogStyle = {
   footerBg: '#f9fafb',
   footerText: '#9ca3af',
   footerBorder: '#e5e7eb',
+
+  reviewBg: '#dcfce7',
+  reviewBorder: '#bbf7d0',
+  reviewText: '#111827',
+  reviewSubtext: '#6b7280',
+  reviewInputBg: '#ffffff',
 };
 
 export interface CatalogPreset {
@@ -92,6 +104,8 @@ export const CATALOG_PRESETS: CatalogPreset[] = [
       pillActiveBg: '#2563eb',
       headerBorder: '#bfdbfe',
       footerBorder: '#bfdbfe',
+      reviewBg: '#dbeafe',
+      reviewBorder: '#bfdbfe',
     },
   },
   {
@@ -120,6 +134,11 @@ export const CATALOG_PRESETS: CatalogPreset[] = [
       footerBg: '#111827',
       footerText: '#6b7280',
       footerBorder: '#374151',
+      reviewBg: '#1f2937',
+      reviewBorder: '#374151',
+      reviewText: '#f9fafb',
+      reviewSubtext: '#9ca3af',
+      reviewInputBg: '#374151',
     },
   },
   {
@@ -136,6 +155,8 @@ export const CATALOG_PRESETS: CatalogPreset[] = [
       pillActiveBg: '#ea580c',
       headerBorder: '#fed7aa',
       footerBorder: '#fed7aa',
+      reviewBg: '#ffedd5',
+      reviewBorder: '#fed7aa',
     },
   },
   {
@@ -152,6 +173,8 @@ export const CATALOG_PRESETS: CatalogPreset[] = [
       pillActiveBg: '#9333ea',
       headerBorder: '#e9d5ff',
       footerBorder: '#e9d5ff',
+      reviewBg: '#f3e8ff',
+      reviewBorder: '#e9d5ff',
     },
   },
   {
@@ -168,6 +191,8 @@ export const CATALOG_PRESETS: CatalogPreset[] = [
       pillActiveBg: '#db2777',
       headerBorder: '#fbcfe8',
       footerBorder: '#fbcfe8',
+      reviewBg: '#fce7f3',
+      reviewBorder: '#fbcfe8',
     },
   },
   {
@@ -186,6 +211,8 @@ export const CATALOG_PRESETS: CatalogPreset[] = [
       pillActiveBg: '#475569',
       headerBorder: '#e2e8f0',
       footerBorder: '#e2e8f0',
+      reviewBg: '#f1f5f9',
+      reviewBorder: '#e2e8f0',
     },
   },
   {
@@ -202,6 +229,8 @@ export const CATALOG_PRESETS: CatalogPreset[] = [
       pillActiveBg: '#0d9488',
       headerBorder: '#99f6e4',
       footerBorder: '#99f6e4',
+      reviewBg: '#ccfbf1',
+      reviewBorder: '#99f6e4',
     },
   },
 ];
@@ -278,6 +307,11 @@ export function catalogStyleVars(style: CatalogStyle): string {
     `--cs-footer-bg:${style.footerBg}`,
     `--cs-footer-text:${style.footerText}`,
     `--cs-footer-border:${style.footerBorder}`,
+    `--cs-review-bg:${style.reviewBg}`,
+    `--cs-review-border:${style.reviewBorder}`,
+    `--cs-review-text:${style.reviewText}`,
+    `--cs-review-subtext:${style.reviewSubtext}`,
+    `--cs-review-input-bg:${style.reviewInputBg}`,
   ];
   return vars.join(';');
 }

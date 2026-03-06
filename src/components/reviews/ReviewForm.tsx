@@ -64,12 +64,20 @@ export default function ReviewForm({ type, targetId, storeId, onSubmitted }: Pro
 
   if (success) {
     return (
-      <div className="rounded-xl p-6 text-center" style={{ background: 'var(--cs-card-bg, #ffffff)', border: '1px solid var(--cs-card-border, #e5e7eb)' }}>
-        <div className="text-3xl mb-2">&#10004;&#65039;</div>
-        <p className="font-semibold" style={{ color: 'var(--cs-product-name, #111827)' }}>Terima kasih atas ulasan Anda!</p>
+      <div
+        className="rounded-xl sm:rounded-2xl p-6 sm:p-8 text-center"
+        style={{
+          background: 'var(--cs-review-bg, #dcfce7)',
+          border: '1px solid var(--cs-review-border, #bbf7d0)',
+        }}
+      >
+        <div className="text-4xl sm:text-5xl mb-3">&#10004;&#65039;</div>
+        <p className="font-semibold text-base sm:text-lg" style={{ color: 'var(--cs-review-text, #111827)' }}>
+          Terima kasih atas ulasan Anda!
+        </p>
         <button
           onClick={() => setSuccess(false)}
-          className="mt-3 text-sm underline"
+          className="mt-3 text-sm sm:text-base font-medium underline underline-offset-2"
           style={{ color: 'var(--cs-accent, #16a34a)' }}
         >
           Tulis ulasan lagi
@@ -81,20 +89,23 @@ export default function ReviewForm({ type, targetId, storeId, onSubmitted }: Pro
   return (
     <form
       onSubmit={handleSubmit}
-      className="rounded-xl p-5"
-      style={{ background: 'var(--cs-card-bg, #ffffff)', border: '1px solid var(--cs-card-border, #e5e7eb)' }}
+      className="rounded-xl sm:rounded-2xl p-4 sm:p-6"
+      style={{
+        background: 'var(--cs-review-bg, #dcfce7)',
+        border: '1px solid var(--cs-review-border, #bbf7d0)',
+      }}
     >
-      <h3 className="font-bold mb-4" style={{ color: 'var(--cs-product-name, #111827)' }}>
+      <h3 className="font-bold text-base sm:text-lg mb-3 sm:mb-4" style={{ color: 'var(--cs-review-text, #111827)' }}>
         Tulis Ulasan
       </h3>
 
       {error && (
-        <div className="mb-3 px-3 py-2 bg-red-50 text-red-600 text-sm rounded-lg">{error}</div>
+        <div className="mb-3 px-3 py-2.5 bg-red-50 text-red-600 text-sm rounded-lg">{error}</div>
       )}
 
-      <div className="space-y-3">
+      <div className="space-y-3 sm:space-y-4">
         <div>
-          <label className="block text-sm font-medium mb-1" style={{ color: 'var(--cs-header-subtext, #6b7280)' }}>
+          <label className="block text-sm font-medium mb-1.5" style={{ color: 'var(--cs-review-subtext, #6b7280)' }}>
             Nama
           </label>
           <input
@@ -103,20 +114,26 @@ export default function ReviewForm({ type, targetId, storeId, onSubmitted }: Pro
             onChange={e => setName(e.target.value)}
             placeholder="Nama Anda"
             maxLength={100}
-            className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500/30 focus:border-green-500"
+            className="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg sm:rounded-xl text-sm sm:text-base focus:outline-none focus:ring-2 focus:border-transparent"
+            style={{
+              backgroundColor: 'var(--cs-review-input-bg, #ffffff)',
+              color: 'var(--cs-review-text, #111827)',
+              border: '1px solid var(--cs-review-border, #bbf7d0)',
+              '--tw-ring-color': 'var(--cs-accent, #16a34a)',
+            } as React.CSSProperties}
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-1" style={{ color: 'var(--cs-header-subtext, #6b7280)' }}>
+          <label className="block text-sm font-medium mb-1.5" style={{ color: 'var(--cs-review-subtext, #6b7280)' }}>
             Rating
           </label>
           <StarRating rating={rating} size="lg" interactive onChange={setRating} />
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-1" style={{ color: 'var(--cs-header-subtext, #6b7280)' }}>
-            Komentar <span className="font-normal text-gray-400">(opsional)</span>
+          <label className="block text-sm font-medium mb-1.5" style={{ color: 'var(--cs-review-subtext, #6b7280)' }}>
+            Komentar <span className="font-normal opacity-60">(opsional)</span>
           </label>
           <textarea
             value={comment}
@@ -124,14 +141,20 @@ export default function ReviewForm({ type, targetId, storeId, onSubmitted }: Pro
             placeholder="Tulis komentar Anda..."
             maxLength={1000}
             rows={3}
-            className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm resize-none focus:outline-none focus:ring-2 focus:ring-green-500/30 focus:border-green-500"
+            className="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg sm:rounded-xl text-sm sm:text-base resize-none focus:outline-none focus:ring-2 focus:border-transparent"
+            style={{
+              backgroundColor: 'var(--cs-review-input-bg, #ffffff)',
+              color: 'var(--cs-review-text, #111827)',
+              border: '1px solid var(--cs-review-border, #bbf7d0)',
+              '--tw-ring-color': 'var(--cs-accent, #16a34a)',
+            } as React.CSSProperties}
           />
         </div>
 
         <button
           type="submit"
           disabled={loading}
-          className="w-full py-2.5 rounded-lg text-sm font-semibold text-white transition-colors disabled:opacity-50"
+          className="w-full py-3 sm:py-3.5 rounded-lg sm:rounded-xl text-sm sm:text-base font-semibold text-white transition-all disabled:opacity-50 hover:opacity-90 active:scale-[0.98]"
           style={{ backgroundColor: 'var(--cs-accent, #16a34a)' }}
         >
           {loading ? 'Mengirim...' : 'Kirim Ulasan'}

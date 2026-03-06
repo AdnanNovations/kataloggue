@@ -11,7 +11,7 @@ interface Props {
 const sizes = {
   sm: 'w-4 h-4',
   md: 'w-5 h-5',
-  lg: 'w-6 h-6',
+  lg: 'w-7 h-7 sm:w-8 sm:h-8',
 };
 
 export default function StarRating({ rating, max = 5, size = 'sm', interactive = false, onChange }: Props) {
@@ -20,7 +20,7 @@ export default function StarRating({ rating, max = 5, size = 'sm', interactive =
   const display = hovered || rating;
 
   return (
-    <div className="flex items-center gap-0.5">
+    <div className={`flex items-center ${size === 'lg' ? 'gap-1' : 'gap-0.5'}`}>
       {Array.from({ length: max }, (_, i) => {
         const starValue = i + 1;
         const filled = starValue <= display;
@@ -29,7 +29,7 @@ export default function StarRating({ rating, max = 5, size = 'sm', interactive =
             key={i}
             type="button"
             disabled={!interactive}
-            className={`${sizes[size]} ${interactive ? 'cursor-pointer' : 'cursor-default'} transition-colors`}
+            className={`${sizes[size]} ${interactive ? 'cursor-pointer hover:scale-110' : 'cursor-default'} transition-all flex-shrink-0`}
             onClick={() => interactive && onChange?.(starValue)}
             onMouseEnter={() => interactive && setHovered(starValue)}
             onMouseLeave={() => interactive && setHovered(0)}
