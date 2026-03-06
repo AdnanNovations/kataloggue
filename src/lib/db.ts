@@ -42,3 +42,22 @@ export interface Product {
   sort_order: number;
   created_at: string;
 }
+
+export interface StoreReview {
+  id: string;
+  store_id: string;
+  reviewer_name: string;
+  rating: number;
+  comment: string | null;
+  created_at: string;
+}
+
+export interface ProductReview {
+  id: string;
+  product_id: string;
+  store_id: string;
+  reviewer_name: string;
+  rating: number;
+  comment: string | null;
+  created_at: string;
+}

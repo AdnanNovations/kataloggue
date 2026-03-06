@@ -8,6 +8,8 @@ import CategoryFilter from '../../components/catalog/CategoryFilter.astro';
 import ProductGrid from '../../components/catalog/ProductGrid.astro';
 import WhatsAppButton from '../../components/catalog/WhatsAppButton.astro';
 import Footer from '../../components/Footer.astro';
+import ReviewDialog from '../../components/reviews/ReviewDialog';
+import ReviewForm from '../../components/reviews/ReviewForm';
 import { query } from '../../lib/db';
 import { storeJsonLd, storeUrl } from '../../lib/seo';
 import { resolveCatalogStyle, catalogStyleVars } from '../../lib/catalog-style';
@@ -50,6 +52,14 @@ const { rows: catRows } = await query(
 );
 const categories = catRows.map(r => r.category as string);
 
+// Get store review stats
+const { rows: reviewStats } = await query(
+  'SELECT COUNT(*)::int AS total, COALESCE(AVG(rating), 0)::numeric(2,1) AS avg_rating FROM store_reviews WHERE store_id = $1',
+  [store.id],
+);
+const storeAvgRating = parseFloat(reviewStats[0].avg_rating);
+const storeTotalReviews = reviewStats[0].total;
+
 // Cache for 5 minutes
 Astro.response.headers.set('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=600');
 ---
@@ -74,7 +84,11 @@ Astro.response.headers.set('Cache-Control', 'public, s-maxage=300, stale-while-r
             <div style={`position:fixed;inset:0;background:rgba(0,0,0,${cs.pageBgOverlay / 100});z-index:0;pointer-events:none`} />
           )}
           <div style="position:relative;z-index:1">
-            <StoreHeader store={store} productCount={allProducts.length} />
+            <StoreHeader store={store} productCount={allProducts.length} avgRating={storeAvgRating} totalReviews={storeTotalReviews} />
+
+            <div class="max-w-5xl mx-auto px-3 sm:px-4 pt-3">
+              <ReviewDialog client:load type="store" targetId={store.id} avgRating={storeAvgRating} totalReviews={storeTotalReviews} />
+            </div>
 
             <main class="max-w-5xl mx-auto px-3 sm:px-4 py-4 sm:py-8 pb-24 md:pb-8">
               <CategoryFilter
@@ -96,6 +110,10 @@ Astro.response.headers.set('Cache-Control', 'public, s-maxage=300, stale-while-r
               >
                 Hubungi via WhatsApp
               </WhatsAppButton>
+            </div>
+
+            <div class="max-w-5xl mx-auto px-3 sm:px-4 pb-24 md:pb-8">
+              <ReviewForm client:load type="store" targetId={store.id} storeId={store.id} />
             </div>
 
             <Footer showBadge={true} useCatalogStyle={true} />

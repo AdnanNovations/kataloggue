@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import ProductForm from './ProductForm';
+import StarRating from '../reviews/StarRating';
 
 interface Product {
   id: string;
@@ -10,6 +11,8 @@ interface Product {
   image_url: string | null;
   category: string | null;
   is_available: boolean;
+  avg_rating?: number;
+  review_count?: number;
 }
 
 interface Props {
@@ -125,9 +128,17 @@ export default function ProductList({ initialProducts, storeSlug }: Props) {
                   )}
                 </div>
                 <p className="text-green-600 font-semibold">{formatPrice(product.price)}</p>
-                {product.category && (
-                  <p className="text-xs text-gray-400">{product.category}</p>
-                )}
+                <div className="flex items-center gap-2 flex-wrap">
+                  {product.category && (
+                    <span className="text-xs text-gray-400">{product.category}</span>
+                  )}
+                  {(product.review_count ?? 0) > 0 && (
+                    <span className="flex items-center gap-1 text-xs text-gray-500">
+                      <StarRating rating={Math.round(product.avg_rating ?? 0)} size="sm" />
+                      ({product.review_count})
+                    </span>
+                  )}
+                </div>
               </div>
               <div className="flex gap-2 flex-shrink-0">
                 <button

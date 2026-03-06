@@ -1,0 +1,58 @@
+---
+export const prerender = false;
+
+import DashboardLayout from '../../layouts/DashboardLayout.astro';
+import ReviewList from '../../components/dashboard/ReviewList';
+import { query } from '../../lib/db';
+
+const user = Astro.locals.user;
+
+// Get store
+const { rows: stores } = await query('SELECT * FROM stores WHERE user_id = $1', [user.id]);
+const store = stores[0];
+
+if (!store) {
+  return Astro.redirect('/dashboard/pengaturan');
+}
+
+// Get store reviews
+const { rows: storeReviews } = await query(
+  'SELECT * FROM store_reviews WHERE store_id = $1 ORDER BY created_at DESC',
+  [store.id],
+);
+
+// Get product reviews with product name
+const { rows: productReviews } = await query(
+  `SELECT pr.*, p.name AS product_name
+   FROM product_reviews pr
+   JOIN products p ON p.id = pr.product_id
+   WHERE pr.store_id = $1
+   ORDER BY pr.created_at DESC`,
+  [store.id],
+);
+
+// Stats
+const { rows: statsRows } = await query(
+  `SELECT
+     (SELECT COUNT(*)::int FROM store_reviews WHERE store_id = $1) AS store_count,
+     (SELECT COALESCE(AVG(rating), 0)::numeric(2,1) FROM store_reviews WHERE store_id = $1) AS store_avg,
+     (SELECT COUNT(*)::int FROM product_reviews WHERE store_id = $1) AS product_count,
+     (SELECT COALESCE(AVG(rating), 0)::numeric(2,1) FROM product_reviews WHERE store_id = $1) AS product_avg`,
+  [store.id],
+);
+const stats = {
+  storeCount: statsRows[0].store_count,
+  storeAvg: parseFloat(statsRows[0].store_avg),
+  productCount: statsRows[0].product_count,
+  productAvg: parseFloat(statsRows[0].product_avg),
+};
+---
+
+<DashboardLayout title="Ulasan">
+  <ReviewList
+    client:load
+    storeReviews={storeReviews}
+    productReviews={productReviews}
+    stats={stats}
+  />
+</DashboardLayout>

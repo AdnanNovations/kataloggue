@@ -15,9 +15,14 @@ if (!store) {
   return Astro.redirect('/dashboard/pengaturan');
 }
 
-// Get products
+// Get products with review stats
 const { rows: products } = await query(
-  'SELECT * FROM products WHERE store_id = $1 ORDER BY sort_order ASC, created_at DESC',
+  `SELECT p.*, COALESCE(AVG(pr.rating), 0)::numeric(2,1) AS avg_rating, COUNT(pr.id)::int AS review_count
+   FROM products p
+   LEFT JOIN product_reviews pr ON pr.product_id = p.id
+   WHERE p.store_id = $1
+   GROUP BY p.id
+   ORDER BY p.sort_order ASC, p.created_at DESC`,
   [store.id],
 );
 ---

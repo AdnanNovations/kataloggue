@@ -17,6 +17,23 @@ if (store) {
   productCount = rows[0].count;
 }
 
+// Get review stats
+let reviewCount = 0;
+let reviewAvg = 0;
+if (store) {
+  const { rows: reviewRows } = await query(
+    `SELECT COUNT(*)::int AS total, COALESCE(AVG(rating), 0)::numeric(2,1) AS avg_rating
+     FROM (
+       SELECT rating FROM store_reviews WHERE store_id = $1
+       UNION ALL
+       SELECT rating FROM product_reviews WHERE store_id = $1
+     ) all_reviews`,
+    [store.id],
+  );
+  reviewCount = reviewRows[0].total;
+  reviewAvg = parseFloat(reviewRows[0].avg_rating);
+}
+
 const hasStore = !!store;
 const host = Astro.request.headers.get('x-forwarded-host') || Astro.request.headers.get('host') || 'kataloggue.my.id';
 const siteUrl = `https://${host}`;
@@ -36,7 +53,7 @@ const siteUrl = `https://${host}`;
       </a>
     </div>
   ) : (
-    <div class="grid md:grid-cols-3 gap-6">
+    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
       <!-- Store Info Card -->
       <div class="bg-white rounded-xl shadow-md p-6">
         <div class="text-sm text-gray-500 mb-1">Toko Anda</div>
@@ -59,6 +76,28 @@ const siteUrl = `https://${host}`;
           class="inline-block mt-3 text-sm text-green-600 hover:underline"
         >
           Kelola Produk &rarr;
+        </a>
+      </div>
+
+      <!-- Reviews Card -->
+      <div class="bg-white rounded-xl shadow-md p-6">
+        <div class="text-sm text-gray-500 mb-1">Total Ulasan</div>
+        <div class="flex items-baseline gap-2">
+          <span class="text-3xl font-bold text-gray-900">{reviewCount}</span>
+          {reviewAvg > 0 && (
+            <span class="text-sm text-amber-500 flex items-center gap-0.5">
+              <svg class="w-4 h-4 inline" viewBox="0 0 24 24" fill="#fbbf24" stroke="#fbbf24" stroke-width="2">
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+              </svg>
+              {reviewAvg.toFixed(1)}
+            </span>
+          )}
+        </div>
+        <a
+          href="/dashboard/ulasan"
+          class="inline-block mt-3 text-sm text-green-600 hover:underline"
+        >
+          Lihat Ulasan &rarr;
         </a>
       </div>
 

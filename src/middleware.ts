@@ -6,7 +6,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
 
   // Only protect dashboard and API routes (except auth endpoints)
   const isProtected = pathname.startsWith('/dashboard') || pathname.startsWith('/api/');
-  const isAuthRoute = pathname.startsWith('/api/auth/') || pathname === '/api/logout';
+  const isAuthRoute = pathname.startsWith('/api/auth/') || pathname === '/api/logout' || pathname.startsWith('/api/reviews/');
   const isUploadServe = pathname.startsWith('/uploads/');
   if (!isProtected || isAuthRoute || isUploadServe) return next();
 
