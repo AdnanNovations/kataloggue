@@ -10,7 +10,7 @@ import WhatsAppButton from '../../components/catalog/WhatsAppButton.astro';
 import Footer from '../../components/Footer.astro';
 import { query } from '../../lib/db';
 import { storeJsonLd, storeUrl } from '../../lib/seo';
-import { themeStyle } from '../../lib/theme';
+import { resolveCatalogStyle, catalogStyleVars } from '../../lib/catalog-style';
 
 const { toko } = Astro.params;
 
@@ -65,31 +65,43 @@ Astro.response.headers.set('Cache-Control', 'public, s-maxage=300, stale-while-r
     />
   </Fragment>
 
-  <div style={themeStyle(store.theme)}>
-    <StoreHeader store={store} productCount={allProducts.length} />
+  {(() => {
+    const cs = resolveCatalogStyle(store.catalog_style, store.theme);
+    return (
+      <div style={catalogStyleVars(cs)}>
+        <div style={`min-height:100vh;background-color:var(--cs-page-bg)${cs.pageBgImage ? `;background-image:url(${cs.pageBgImage});background-size:cover;background-position:center;background-attachment:fixed` : ''}`}>
+          {cs.pageBgImage && cs.pageBgOverlay > 0 && (
+            <div style={`position:fixed;inset:0;background:rgba(0,0,0,${cs.pageBgOverlay / 100});z-index:0;pointer-events:none`} />
+          )}
+          <div style="position:relative;z-index:1">
+            <StoreHeader store={store} productCount={allProducts.length} />
 
-    <main class="max-w-5xl mx-auto px-3 sm:px-4 py-4 sm:py-8 pb-24 md:pb-8">
-      <CategoryFilter
-        categories={categories}
-        storeSlug={store.slug}
-        activeCategory={activeCategory}
-      />
+            <main class="max-w-5xl mx-auto px-3 sm:px-4 py-4 sm:py-8 pb-24 md:pb-8">
+              <CategoryFilter
+                categories={categories}
+                storeSlug={store.slug}
+                activeCategory={activeCategory}
+              />
 
-      <ProductGrid products={allProducts} storeSlug={store.slug} />
-    </main>
+              <ProductGrid products={allProducts} storeSlug={store.slug} />
+            </main>
 
-    <!-- Mobile WhatsApp sticky button -->
-    <div class="md:hidden fixed bottom-4 left-4 right-4 z-40">
-      <WhatsAppButton
-        phone={store.wa_number}
-        storeName={store.name}
-        size="lg"
-        class="w-full shadow-xl"
-      >
-        Hubungi via WhatsApp
-      </WhatsAppButton>
-    </div>
-  </div>
+            <!-- Mobile WhatsApp sticky button -->
+            <div class="md:hidden fixed bottom-4 left-4 right-4 z-40">
+              <WhatsAppButton
+                phone={store.wa_number}
+                storeName={store.name}
+                size="lg"
+                class="w-full shadow-xl"
+              >
+                Hubungi via WhatsApp
+              </WhatsAppButton>
+            </div>
 
-  <Footer showBadge={true} />
+            <Footer showBadge={true} useCatalogStyle={true} />
+          </div>
+        </div>
+      </div>
+    );
+  })()}
 </BaseLayout>

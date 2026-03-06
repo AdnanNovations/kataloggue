@@ -19,6 +19,7 @@ CREATE TABLE stores (
   wa_number TEXT NOT NULL,
   address TEXT,
   theme TEXT DEFAULT 'default',
+  catalog_style TEXT,
   created_at TIMESTAMPTZ DEFAULT now()
 );
 

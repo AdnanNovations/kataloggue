@@ -11,7 +11,7 @@ interface Props {
 const { store, productCount } = Astro.props;
 ---
 
-<header class="bg-white border-b border-gray-200">
+<header style="background-color:var(--cs-header-bg, #ffffff);border-bottom:1px solid var(--cs-header-border, #e5e7eb)">
   <div class="max-w-5xl mx-auto px-3 sm:px-4 py-5 sm:py-8">
     <div class="flex items-start sm:items-center gap-3 sm:gap-5">
       {store.logo_url ? (
@@ -23,17 +23,17 @@ const { store, productCount } = Astro.props;
           height="80"
         />
       ) : (
-        <div class="w-14 h-14 sm:w-20 sm:h-20 rounded-full flex items-center justify-center text-2xl sm:text-3xl font-bold flex-shrink-0" style="background-color: var(--store-primary-light, #dcfce7); color: var(--store-primary, #16a34a)">
+        <div class="w-14 h-14 sm:w-20 sm:h-20 rounded-full flex items-center justify-center text-2xl sm:text-3xl font-bold flex-shrink-0" style="background-color: var(--cs-accent-light, #dcfce7); color: var(--cs-accent, #16a34a)">
           {store.name.charAt(0).toUpperCase()}
         </div>
       )}
 
       <div class="flex-1 min-w-0">
-        <h1 class="text-lg sm:text-2xl md:text-3xl font-bold text-gray-900 truncate">{store.name}</h1>
+        <h1 class="text-lg sm:text-2xl md:text-3xl font-bold truncate" style="color:var(--cs-header-text, #111827)">{store.name}</h1>
         {store.description && (
-          <p class="text-gray-500 mt-0.5 sm:mt-1 text-sm sm:text-base line-clamp-2">{store.description}</p>
+          <p class="mt-0.5 sm:mt-1 text-sm sm:text-base line-clamp-2" style="color:var(--cs-header-subtext, #6b7280)">{store.description}</p>
         )}
-        <div class="flex flex-wrap items-center gap-x-3 gap-y-0.5 mt-1 sm:mt-2 text-xs sm:text-sm text-gray-400">
+        <div class="flex flex-wrap items-center gap-x-3 gap-y-0.5 mt-1 sm:mt-2 text-xs sm:text-sm" style="color:var(--cs-header-subtext, #9ca3af)">
           {store.address && <span>&#128205; {store.address}</span>}
           <span>{productCount} produk</span>
         </div>

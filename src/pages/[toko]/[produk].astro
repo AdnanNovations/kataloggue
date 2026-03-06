@@ -8,7 +8,7 @@ import Footer from '../../components/Footer.astro';
 import { query } from '../../lib/db';
 import { formatPrice, imageUrl } from '../../lib/utils';
 import { productJsonLd, productUrl } from '../../lib/seo';
-import { themeStyle } from '../../lib/theme';
+import { resolveCatalogStyle, catalogStyleVars } from '../../lib/catalog-style';
 
 const { toko, produk } = Astro.params;
 
@@ -51,13 +51,21 @@ Astro.response.headers.set('Cache-Control', 'public, s-maxage=300, stale-while-r
     />
   </Fragment>
 
-  <div style={themeStyle(store.theme)}>
-  <!-- Breadcrumb -->
-  <nav class="bg-white border-b border-gray-100">
-    <div class="max-w-5xl mx-auto px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-500 truncate">
-      <a href={`/${store.slug}`} class="hover:text-green-600 transition-colors">{store.name}</a>
+  {(() => {
+    const cs = resolveCatalogStyle(store.catalog_style, store.theme);
+    return (
+      <div style={catalogStyleVars(cs)}>
+      <div style={`min-height:100vh;background-color:var(--cs-page-bg)${cs.pageBgImage ? `;background-image:url(${cs.pageBgImage});background-size:cover;background-position:center;background-attachment:fixed` : ''}`}>
+      {cs.pageBgImage && cs.pageBgOverlay > 0 && (
+        <div style={`position:fixed;inset:0;background:rgba(0,0,0,${cs.pageBgOverlay / 100});z-index:0;pointer-events:none`} />
+      )}
+      <div style="position:relative;z-index:1">
+      <!-- Breadcrumb -->
+      <nav style="background-color:var(--cs-header-bg);border-bottom:1px solid var(--cs-header-border)">
+    <div class="max-w-5xl mx-auto px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm truncate" style="color:var(--cs-header-subtext)">
+      <a href={`/${store.slug}`} class="transition-colors" style="color:var(--cs-header-subtext)">{store.name}</a>
       <span class="mx-1 sm:mx-2">/</span>
-      <span class="text-gray-900">{product.name}</span>
+      <span style="color:var(--cs-header-text)">{product.name}</span>
     </div>
   </nav>
 
@@ -85,12 +93,12 @@ Astro.response.headers.set('Cache-Control', 'public, s-maxage=300, stale-while-r
       <!-- Product Info -->
       <div>
         {product.category && (
-          <span class="text-xs sm:text-sm text-gray-400 uppercase tracking-wide">{product.category}</span>
+          <span class="text-xs sm:text-sm uppercase tracking-wide" style="color:var(--cs-category-label)">{product.category}</span>
         )}
-        <h1 class="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 mt-1">{product.name}</h1>
+        <h1 class="text-xl sm:text-2xl md:text-3xl font-bold mt-1" style="color:var(--cs-product-name)">{product.name}</h1>
 
         <div class="mt-3 sm:mt-4">
-          <span class="text-2xl sm:text-3xl font-bold" style="color: var(--store-primary)">{formatPrice(product.price)}</span>
+          <span class="text-2xl sm:text-3xl font-bold" style="color:var(--cs-price)">{formatPrice(product.price)}</span>
         </div>
 
         {!product.is_available && (
@@ -101,8 +109,8 @@ Astro.response.headers.set('Cache-Control', 'public, s-maxage=300, stale-while-r
 
         {product.description && (
           <div class="mt-4 sm:mt-6">
-            <h2 class="font-semibold text-gray-900 mb-1 sm:mb-2 text-sm sm:text-base">Deskripsi</h2>
-            <p class="text-gray-600 whitespace-pre-line text-sm sm:text-base">{product.description}</p>
+            <h2 class="font-semibold mb-1 sm:mb-2 text-sm sm:text-base" style="color:var(--cs-product-name)">Deskripsi</h2>
+            <p class="whitespace-pre-line text-sm sm:text-base" style="color:var(--cs-header-subtext)">{product.description}</p>
           </div>
         )}
 
@@ -144,11 +152,11 @@ Astro.response.headers.set('Cache-Control', 'public, s-maxage=300, stale-while-r
     <!-- Related Products -->
     {relatedProducts && relatedProducts.length > 0 && (
       <section class="mt-10 sm:mt-16">
-        <h2 class="text-lg sm:text-xl font-bold text-gray-900 mb-4 sm:mb-6">Produk Lainnya</h2>
+        <h2 class="text-lg sm:text-xl font-bold mb-4 sm:mb-6" style="color:var(--cs-product-name)">Produk Lainnya</h2>
         <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
           {relatedProducts.map(rp => (
             <a href={`/${store.slug}/${rp.slug}`} class="group">
-              <div class="bg-white rounded-lg sm:rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+              <div class="overflow-hidden hover:shadow-lg transition-shadow" style={`background:var(--cs-card-bg);border-radius:var(--cs-card-radius);box-shadow:var(--cs-card-shadow);border:1px solid var(--cs-card-border)`}>
                 <div class="aspect-square bg-gray-100 overflow-hidden">
                   {rp.image_url ? (
                     <img
@@ -164,8 +172,8 @@ Astro.response.headers.set('Cache-Control', 'public, s-maxage=300, stale-while-r
                   )}
                 </div>
                 <div class="p-2 sm:p-3">
-                  <h3 class="text-xs sm:text-sm font-medium text-gray-900 line-clamp-1">{rp.name}</h3>
-                  <p class="text-xs sm:text-sm font-bold" style="color: var(--store-primary)">{formatPrice(rp.price)}</p>
+                  <h3 class="text-xs sm:text-sm font-medium line-clamp-1" style="color:var(--cs-product-name)">{rp.name}</h3>
+                  <p class="text-xs sm:text-sm font-bold" style="color:var(--cs-price)">{formatPrice(rp.price)}</p>
                 </div>
               </div>
             </a>
@@ -174,9 +182,13 @@ Astro.response.headers.set('Cache-Control', 'public, s-maxage=300, stale-while-r
       </section>
     )}
   </main>
-  </div>
 
-  <Footer showBadge={true} />
+  <Footer showBadge={true} useCatalogStyle={true} />
+  </div>
+  </div>
+  </div>
+    );
+  })()}
 </BaseLayout>
 
 <script>

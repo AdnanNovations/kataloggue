@@ -1,14 +1,25 @@
 ---
 interface Props {
   showBadge?: boolean;
+  useCatalogStyle?: boolean;
 }
 
-const { showBadge = false } = Astro.props;
+const { showBadge = false, useCatalogStyle = false } = Astro.props;
 const year = new Date().getFullYear();
+
+const footerStyle = useCatalogStyle
+  ? 'background-color:var(--cs-footer-bg, #f9fafb);border-top:1px solid var(--cs-footer-border, #e5e7eb)'
+  : undefined;
+const textStyle = useCatalogStyle
+  ? 'color:var(--cs-footer-text, #9ca3af)'
+  : undefined;
+const footerClass = useCatalogStyle
+  ? 'mt-auto'
+  : 'bg-gray-50 border-t border-gray-200 mt-auto';
 ---
 
-<footer class="bg-gray-50 border-t border-gray-200 mt-auto">
-  <div class="max-w-6xl mx-auto px-4 py-8 text-center text-sm text-gray-500">
+<footer class={footerClass} style={footerStyle}>
+  <div class={`max-w-6xl mx-auto px-4 py-8 text-center text-sm ${useCatalogStyle ? '' : 'text-gray-500'}`} style={textStyle}>
     {showBadge && (
       <a
         href="https://kataloggue.my.id"

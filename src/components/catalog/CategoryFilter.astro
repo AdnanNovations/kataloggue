@@ -12,24 +12,20 @@ const { categories, storeSlug, activeCategory } = Astro.props;
   <div class="flex flex-nowrap sm:flex-wrap gap-2 mb-4 sm:mb-6 overflow-x-auto pb-2 sm:pb-0 -mx-3 px-3 sm:mx-0 sm:px-0 scrollbar-hide">
     <a
       href={`/${storeSlug}`}
-      class={`px-3 sm:px-4 py-1.5 rounded-full text-xs sm:text-sm font-medium transition-colors whitespace-nowrap flex-shrink-0 ${
-        !activeCategory
-          ? 'text-white'
-          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-      }`}
-      style={!activeCategory ? 'background-color: var(--store-primary, #16a34a)' : undefined}
+      class="px-3 sm:px-4 py-1.5 rounded-full text-xs sm:text-sm font-medium transition-colors whitespace-nowrap flex-shrink-0"
+      style={!activeCategory
+        ? 'background-color:var(--cs-pill-active-bg, #16a34a);color:var(--cs-pill-active-text, #ffffff)'
+        : 'background-color:var(--cs-pill-bg, #f3f4f6);color:var(--cs-pill-text, #374151)'}
     >
       Semua
     </a>
     {categories.map(cat => (
       <a
         href={`/${storeSlug}?kategori=${encodeURIComponent(cat)}`}
-        class={`px-3 sm:px-4 py-1.5 rounded-full text-xs sm:text-sm font-medium transition-colors whitespace-nowrap flex-shrink-0 ${
-          activeCategory === cat
-            ? 'text-white'
-            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-        }`}
-        style={activeCategory === cat ? 'background-color: var(--store-primary, #16a34a)' : undefined}
+        class="px-3 sm:px-4 py-1.5 rounded-full text-xs sm:text-sm font-medium transition-colors whitespace-nowrap flex-shrink-0"
+        style={activeCategory === cat
+          ? 'background-color:var(--cs-pill-active-bg, #16a34a);color:var(--cs-pill-active-text, #ffffff)'
+          : 'background-color:var(--cs-pill-bg, #f3f4f6);color:var(--cs-pill-text, #374151)'}
       >
         {cat}
       </a>

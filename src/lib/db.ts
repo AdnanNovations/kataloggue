@@ -25,6 +25,7 @@ export interface Store {
   wa_number: string;
   address: string | null;
   theme: string;
+  catalog_style: string | null;
   created_at: string;
 }
 

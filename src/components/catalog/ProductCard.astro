@@ -12,7 +12,7 @@ const { product, storeSlug } = Astro.props;
 ---
 
 <a href={`/${storeSlug}/${product.slug}`} class="block group">
-  <div class="bg-white rounded-lg sm:rounded-xl shadow-md overflow-hidden hover:shadow-lg hover:-translate-y-1 transition-all">
+  <div class="overflow-hidden hover:-translate-y-1 transition-all" style="background-color:var(--cs-card-bg, #ffffff);border-radius:var(--cs-card-radius, 0.75rem);box-shadow:var(--cs-card-shadow, 0 1px 2px 0 rgb(0 0 0 / 0.05));border:1px solid var(--cs-card-border, transparent)">
     <div class="aspect-square bg-gray-100 overflow-hidden">
       {product.image_url ? (
         <img
@@ -34,11 +34,11 @@ const { product, storeSlug } = Astro.props;
 
     <div class="p-2.5 sm:p-4">
       {product.category && (
-        <span class="text-[10px] sm:text-xs text-gray-400 uppercase tracking-wide">{product.category}</span>
+        <span class="text-[10px] sm:text-xs uppercase tracking-wide" style="color:var(--cs-category-label, #6b7280)">{product.category}</span>
       )}
-      <h3 class="font-semibold text-gray-900 mt-0.5 sm:mt-1 text-sm sm:text-base line-clamp-2 leading-tight">{product.name}</h3>
+      <h3 class="font-semibold mt-0.5 sm:mt-1 text-sm sm:text-base line-clamp-2 leading-tight" style="color:var(--cs-product-name, #111827)">{product.name}</h3>
       <div class="flex items-center justify-between mt-1.5 sm:mt-2">
-        <span class="text-sm sm:text-lg font-bold" style="color: var(--store-primary, #16a34a)">{formatPrice(product.price)}</span>
+        <span class="text-sm sm:text-lg font-bold" style="color:var(--cs-price, #16a34a)">{formatPrice(product.price)}</span>
         {!product.is_available && <Badge variant="red">Habis</Badge>}
       </div>
     </div>
