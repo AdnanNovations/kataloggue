@@ -8,6 +8,7 @@ import Footer from '../../components/Footer.astro';
 import { query } from '../../lib/db';
 import { formatPrice, imageUrl } from '../../lib/utils';
 import { productJsonLd, productUrl } from '../../lib/seo';
+import { themeStyle } from '../../lib/theme';
 
 const { toko, produk } = Astro.params;
 
@@ -50,6 +51,7 @@ Astro.response.headers.set('Cache-Control', 'public, s-maxage=300, stale-while-r
     />
   </Fragment>
 
+  <div style={themeStyle(store.theme)}>
   <!-- Breadcrumb -->
   <nav class="bg-white border-b border-gray-100">
     <div class="max-w-5xl mx-auto px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-500 truncate">
@@ -88,7 +90,7 @@ Astro.response.headers.set('Cache-Control', 'public, s-maxage=300, stale-while-r
         <h1 class="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 mt-1">{product.name}</h1>
 
         <div class="mt-3 sm:mt-4">
-          <span class="text-2xl sm:text-3xl font-bold text-green-600">{formatPrice(product.price)}</span>
+          <span class="text-2xl sm:text-3xl font-bold" style="color: var(--store-primary)">{formatPrice(product.price)}</span>
         </div>
 
         {!product.is_available && (
@@ -163,7 +165,7 @@ Astro.response.headers.set('Cache-Control', 'public, s-maxage=300, stale-while-r
                 </div>
                 <div class="p-2 sm:p-3">
                   <h3 class="text-xs sm:text-sm font-medium text-gray-900 line-clamp-1">{rp.name}</h3>
-                  <p class="text-xs sm:text-sm font-bold text-green-600">{formatPrice(rp.price)}</p>
+                  <p class="text-xs sm:text-sm font-bold" style="color: var(--store-primary)">{formatPrice(rp.price)}</p>
                 </div>
               </div>
             </a>
@@ -172,6 +174,7 @@ Astro.response.headers.set('Cache-Control', 'public, s-maxage=300, stale-while-r
       </section>
     )}
   </main>
+  </div>
 
   <Footer showBadge={true} />
 </BaseLayout>

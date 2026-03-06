@@ -10,6 +10,7 @@ import WhatsAppButton from '../../components/catalog/WhatsAppButton.astro';
 import Footer from '../../components/Footer.astro';
 import { query } from '../../lib/db';
 import { storeJsonLd, storeUrl } from '../../lib/seo';
+import { themeStyle } from '../../lib/theme';
 
 const { toko } = Astro.params;
 
@@ -64,28 +65,30 @@ Astro.response.headers.set('Cache-Control', 'public, s-maxage=300, stale-while-r
     />
   </Fragment>
 
-  <StoreHeader store={store} productCount={allProducts.length} />
+  <div style={themeStyle(store.theme)}>
+    <StoreHeader store={store} productCount={allProducts.length} />
 
-  <main class="max-w-5xl mx-auto px-3 sm:px-4 py-4 sm:py-8 pb-24 md:pb-8">
-    <CategoryFilter
-      categories={categories}
-      storeSlug={store.slug}
-      activeCategory={activeCategory}
-    />
+    <main class="max-w-5xl mx-auto px-3 sm:px-4 py-4 sm:py-8 pb-24 md:pb-8">
+      <CategoryFilter
+        categories={categories}
+        storeSlug={store.slug}
+        activeCategory={activeCategory}
+      />
 
-    <ProductGrid products={allProducts} storeSlug={store.slug} />
-  </main>
+      <ProductGrid products={allProducts} storeSlug={store.slug} />
+    </main>
 
-  <!-- Mobile WhatsApp sticky button -->
-  <div class="md:hidden fixed bottom-4 left-4 right-4 z-40">
-    <WhatsAppButton
-      phone={store.wa_number}
-      storeName={store.name}
-      size="lg"
-      class="w-full shadow-xl"
-    >
-      Hubungi via WhatsApp
-    </WhatsAppButton>
+    <!-- Mobile WhatsApp sticky button -->
+    <div class="md:hidden fixed bottom-4 left-4 right-4 z-40">
+      <WhatsAppButton
+        phone={store.wa_number}
+        storeName={store.name}
+        size="lg"
+        class="w-full shadow-xl"
+      >
+        Hubungi via WhatsApp
+      </WhatsAppButton>
+    </div>
   </div>
 
   <Footer showBadge={true} />

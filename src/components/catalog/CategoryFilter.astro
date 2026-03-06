@@ -14,9 +14,10 @@ const { categories, storeSlug, activeCategory } = Astro.props;
       href={`/${storeSlug}`}
       class={`px-3 sm:px-4 py-1.5 rounded-full text-xs sm:text-sm font-medium transition-colors whitespace-nowrap flex-shrink-0 ${
         !activeCategory
-          ? 'bg-green-600 text-white'
+          ? 'text-white'
           : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
       }`}
+      style={!activeCategory ? 'background-color: var(--store-primary, #16a34a)' : undefined}
     >
       Semua
     </a>
@@ -25,9 +26,10 @@ const { categories, storeSlug, activeCategory } = Astro.props;
         href={`/${storeSlug}?kategori=${encodeURIComponent(cat)}`}
         class={`px-3 sm:px-4 py-1.5 rounded-full text-xs sm:text-sm font-medium transition-colors whitespace-nowrap flex-shrink-0 ${
           activeCategory === cat
-            ? 'bg-green-600 text-white'
+            ? 'text-white'
             : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
         }`}
+        style={activeCategory === cat ? 'background-color: var(--store-primary, #16a34a)' : undefined}
       >
         {cat}
       </a>
