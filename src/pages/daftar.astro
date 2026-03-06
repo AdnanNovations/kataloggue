@@ -18,10 +18,7 @@ import Footer from '../components/Footer.astro';
     <div class="w-full max-w-md">
       <div class="text-center mb-8">
         <a href="/" class="inline-flex items-center gap-2 font-bold text-2xl text-primary mb-4">
-          <svg class="w-10 h-10" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect width="64" height="64" rx="12" fill="#16a34a"/>
-            <text x="32" y="44" font-family="Arial" font-size="36" font-weight="bold" fill="white" text-anchor="middle">G</text>
-          </svg>
+          <img src="/logo-kataloggue.webp" alt="KatalogGue" class="w-10 h-10 rounded-xl" />
           KatalogGue
         </a>
         <h1 class="text-2xl font-bold text-gray-900">Buat Akun Gratis</h1>
@@ -58,8 +55,9 @@ import Footer from '../components/Footer.astro';
           </div>
 
           <button
+            id="submit-btn"
             type="submit"
-            class="w-full bg-primary text-white py-2.5 rounded-lg font-semibold hover:bg-primary-dark transition-colors"
+            class="w-full bg-primary text-white py-2.5 rounded-lg font-semibold hover:bg-primary-dark transition-colors flex items-center justify-center gap-2"
           >
             Daftar Sekarang
           </button>
@@ -87,10 +85,16 @@ import Footer from '../components/Footer.astro';
     }`;
   }
 
+  const submitBtn = document.getElementById('submit-btn') as HTMLButtonElement;
+  const spinnerSvg = `<svg class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>`;
+
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     const email = (form.querySelector('#email') as HTMLInputElement).value;
     const password = (form.querySelector('#password') as HTMLInputElement).value;
+
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = `${spinnerSvg} Memproses...`;
 
     try {
       const res = await fetch('/api/auth/register', {
@@ -108,6 +112,9 @@ import Footer from '../components/Footer.astro';
       window.location.href = '/dashboard';
     } catch {
       showMessage('Terjadi kesalahan. Coba lagi.');
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = 'Daftar Sekarang';
     }
   });
 </script>
