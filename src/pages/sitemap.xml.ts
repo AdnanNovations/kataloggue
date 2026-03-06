@@ -3,6 +3,12 @@ import { query } from '../lib/db';
 
 export const prerender = false;
 
+function toDateStr(d: any): string {
+  if (!d) return new Date().toISOString().split('T')[0];
+  if (d instanceof Date) return d.toISOString().split('T')[0];
+  return String(d).split('T')[0];
+}
+
 export const GET: APIRoute = async () => {
   const siteUrl = 'https://kataloggue.my.id';
 
@@ -17,13 +23,13 @@ export const GET: APIRoute = async () => {
   );
 
   const urls: { loc: string; lastmod: string; priority: string }[] = [
-    { loc: siteUrl, lastmod: new Date().toISOString().split('T')[0], priority: '1.0' },
+    { loc: siteUrl, lastmod: toDateStr(new Date()), priority: '1.0' },
   ];
 
   stores.forEach(store => {
     urls.push({
       loc: `${siteUrl}/${store.slug}`,
-      lastmod: store.created_at?.split('T')[0] || new Date().toISOString().split('T')[0],
+      lastmod: toDateStr(store.created_at),
       priority: '0.8',
     });
   });
@@ -32,7 +38,7 @@ export const GET: APIRoute = async () => {
     if (product.store_slug) {
       urls.push({
         loc: `${siteUrl}/${product.store_slug}/${product.slug}`,
-        lastmod: product.created_at?.split('T')[0] || new Date().toISOString().split('T')[0],
+        lastmod: toDateStr(product.created_at),
         priority: '0.6',
       });
     }
