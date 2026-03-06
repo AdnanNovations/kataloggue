@@ -3,15 +3,12 @@ export const prerender = false;
 
 import DashboardLayout from '../../layouts/DashboardLayout.astro';
 import StoreSettingsForm from '../../components/dashboard/StoreSettingsForm';
-import { supabase } from '../../lib/supabase';
+import { query } from '../../lib/db';
 
 const user = Astro.locals.user;
 
-const { data: store } = await supabase
-  .from('stores')
-  .select('*')
-  .eq('user_id', user.id)
-  .single();
+const { rows: stores } = await query('SELECT * FROM stores WHERE user_id = $1', [user.id]);
+const store = stores[0] || null;
 ---
 
 <DashboardLayout title="Pengaturan Toko">

@@ -2,22 +2,20 @@
 export const prerender = false;
 
 import DashboardLayout from '../../layouts/DashboardLayout.astro';
-import { supabase } from '../../lib/supabase';
+import { query } from '../../lib/db';
 
 const user = Astro.locals.user;
 
 // Get store data
-const { data: store } = await supabase
-  .from('stores')
-  .select('*')
-  .eq('user_id', user.id)
-  .single();
+const { rows: stores } = await query('SELECT * FROM stores WHERE user_id = $1', [user.id]);
+const store = stores[0] || null;
 
 // Get product count
-const { count: productCount } = await supabase
-  .from('products')
-  .select('*', { count: 'exact', head: true })
-  .eq('store_id', store?.id || '');
+let productCount = 0;
+if (store) {
+  const { rows } = await query('SELECT COUNT(*)::int AS count FROM products WHERE store_id = $1', [store.id]);
+  productCount = rows[0].count;
+}
 
 const hasStore = !!store;
 const host = Astro.request.headers.get('x-forwarded-host') || Astro.request.headers.get('host') || 'kataloggue.my.id';

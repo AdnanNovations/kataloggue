@@ -8,46 +8,40 @@ import CategoryFilter from '../../components/catalog/CategoryFilter.astro';
 import ProductGrid from '../../components/catalog/ProductGrid.astro';
 import WhatsAppButton from '../../components/catalog/WhatsAppButton.astro';
 import Footer from '../../components/Footer.astro';
-import { supabase } from '../../lib/supabase';
+import { query } from '../../lib/db';
 import { storeJsonLd, storeUrl } from '../../lib/seo';
 
 const { toko } = Astro.params;
 const activeCategory = Astro.url.searchParams.get('kategori') || undefined;
 
 // Get store by slug
-const { data: store } = await supabase
-  .from('stores')
-  .select('*')
-  .eq('slug', toko)
-  .single();
+const { rows: stores } = await query('SELECT * FROM stores WHERE slug = $1', [toko]);
+const store = stores[0];
 
 if (!store) {
   return Astro.redirect('/');
 }
 
-// Get products
-let query = supabase
-  .from('products')
-  .select('*')
-  .eq('store_id', store.id)
-  .order('sort_order', { ascending: true })
-  .order('created_at', { ascending: false });
+// Get products (with optional category filter)
+let productsQuery: string;
+let productsParams: any[];
 
 if (activeCategory) {
-  query = query.eq('category', activeCategory);
+  productsQuery = 'SELECT * FROM products WHERE store_id = $1 AND category = $2 ORDER BY sort_order ASC, created_at DESC';
+  productsParams = [store.id, activeCategory];
+} else {
+  productsQuery = 'SELECT * FROM products WHERE store_id = $1 ORDER BY sort_order ASC, created_at DESC';
+  productsParams = [store.id];
 }
 
-const { data: products } = await query;
-const allProducts = products || [];
+const { rows: allProducts } = await query(productsQuery, productsParams);
 
 // Get unique categories (from all products, not filtered)
-const { data: allProds } = await supabase
-  .from('products')
-  .select('category')
-  .eq('store_id', store.id)
-  .not('category', 'is', null);
-
-const categories = [...new Set(allProds?.map(p => p.category).filter(Boolean) as string[])];
+const { rows: catRows } = await query(
+  'SELECT DISTINCT category FROM products WHERE store_id = $1 AND category IS NOT NULL',
+  [store.id],
+);
+const categories = catRows.map(r => r.category as string);
 
 // Cache for 5 minutes
 Astro.response.headers.set('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=600');

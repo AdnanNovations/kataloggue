@@ -1,8 +1,4 @@
 import { useState, useRef } from 'react';
-import { createClient } from '@supabase/supabase-js';
-
-const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL;
-const supabaseKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
 
 interface Props {
   currentUrl?: string;
@@ -27,31 +23,21 @@ export default function ImageUpload({ currentUrl, onUploaded }: Props) {
     setUploading(true);
 
     try {
-      // Upload directly to Supabase Storage from browser
-      const supabase = createClient(supabaseUrl, supabaseKey);
+      const formData = new FormData();
+      formData.append('file', file);
 
-      // Restore session from localStorage (set during login)
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        alert('Sesi login habis. Silakan login ulang.');
-        window.location.href = '/masuk';
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        alert(data.error || 'Gagal upload gambar');
         return;
       }
 
-      const ext = file.name.split('.').pop();
-      const fileName = `${session.user.id}/${Date.now()}.${ext}`;
-
-      const { error } = await supabase.storage
-        .from('images')
-        .upload(fileName, file, { contentType: file.type });
-
-      if (error) {
-        alert(error.message);
-        return;
-      }
-
-      const { data: urlData } = supabase.storage.from('images').getPublicUrl(fileName);
-      onUploaded(urlData.publicUrl);
+      onUploaded(data.url);
     } catch {
       alert('Gagal upload gambar');
     } finally {

@@ -1,9 +1,18 @@
-import { createClient } from '@supabase/supabase-js';
+import pg from 'pg';
 
-const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
+const pool = new pg.Pool({
+  connectionString: process.env.DATABASE_URL || 'postgresql://kataloggue:kataloggue@localhost:5432/kataloggue',
+  max: 20,
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 5000,
+});
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+export async function query<T extends pg.QueryResultRow = any>(
+  text: string,
+  params?: any[],
+): Promise<pg.QueryResult<T>> {
+  return pool.query<T>(text, params);
+}
 
 // Types
 export interface Store {

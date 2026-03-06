@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { supabase } from '../lib/supabase';
+import { query } from '../lib/db';
 
 export const prerender = false;
 
@@ -7,19 +7,20 @@ export const GET: APIRoute = async () => {
   const siteUrl = 'https://kataloggue.my.id';
 
   // Get all stores
-  const { data: stores } = await supabase.from('stores').select('slug, created_at');
+  const { rows: stores } = await query('SELECT slug, created_at FROM stores');
 
-  // Get all products with store slugs
-  const { data: products } = await supabase
-    .from('products')
-    .select('slug, created_at, store_id, stores(slug)')
-    .eq('is_available', true);
+  // Get all available products with store slugs
+  const { rows: products } = await query(
+    `SELECT p.slug, p.created_at, s.slug AS store_slug
+     FROM products p JOIN stores s ON p.store_id = s.id
+     WHERE p.is_available = true`,
+  );
 
   const urls: { loc: string; lastmod: string; priority: string }[] = [
     { loc: siteUrl, lastmod: new Date().toISOString().split('T')[0], priority: '1.0' },
   ];
 
-  stores?.forEach(store => {
+  stores.forEach(store => {
     urls.push({
       loc: `${siteUrl}/${store.slug}`,
       lastmod: store.created_at?.split('T')[0] || new Date().toISOString().split('T')[0],
@@ -27,11 +28,10 @@ export const GET: APIRoute = async () => {
     });
   });
 
-  products?.forEach(product => {
-    const storeSlug = (product as any).stores?.slug;
-    if (storeSlug) {
+  products.forEach(product => {
+    if (product.store_slug) {
       urls.push({
-        loc: `${siteUrl}/${storeSlug}/${product.slug}`,
+        loc: `${siteUrl}/${product.store_slug}/${product.slug}`,
         lastmod: product.created_at?.split('T')[0] || new Date().toISOString().split('T')[0],
         priority: '0.6',
       });

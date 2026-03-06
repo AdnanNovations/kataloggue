@@ -1,96 +1,76 @@
 import type { APIRoute } from 'astro';
+import { query } from '../../lib/db';
 
 export const prerender = false;
 
 export const POST: APIRoute = async ({ locals, request }) => {
-  const { supabase, user } = locals;
-  const body = await request.json();
+  try {
+    const { user } = locals;
+    const body = await request.json();
 
-  // Verify store ownership
-  const { data: store } = await supabase
-    .from('stores')
-    .select('id')
-    .eq('user_id', user.id)
-    .single();
+    if (!body.name?.trim() || !body.slug?.trim() || body.price == null) {
+      return new Response(JSON.stringify({ error: 'Nama, slug, dan harga wajib diisi' }), { status: 400 });
+    }
 
-  if (!store) return new Response(JSON.stringify({ error: 'Toko tidak ditemukan' }), { status: 404 });
+    const { rows: stores } = await query('SELECT id FROM stores WHERE user_id = $1', [user.id]);
+    if (stores.length === 0) return new Response(JSON.stringify({ error: 'Toko tidak ditemukan' }), { status: 404 });
 
-  const { data, error } = await supabase
-    .from('products')
-    .insert({
-      store_id: store.id,
-      name: body.name,
-      slug: body.slug,
-      description: body.description,
-      price: body.price,
-      image_url: body.image_url,
-      category: body.category,
-      is_available: body.is_available ?? true,
-      sort_order: body.sort_order ?? 0,
-    })
-    .select()
-    .single();
+    const storeId = stores[0].id;
+    const { rows } = await query(
+      `INSERT INTO products (store_id, name, slug, description, price, image_url, category, is_available, sort_order)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *`,
+      [storeId, body.name.trim(), body.slug.trim(), body.description || null, body.price, body.image_url || null, body.category || null, body.is_available ?? true, body.sort_order ?? 0],
+    );
 
-  if (error) return new Response(JSON.stringify({ error: error.message }), { status: 400 });
-  return new Response(JSON.stringify(data), { status: 201 });
+    return new Response(JSON.stringify(rows[0]), { status: 201 });
+  } catch (err: any) {
+    if (err?.code === '23505') {
+      return new Response(JSON.stringify({ error: 'Slug produk sudah digunakan di toko ini' }), { status: 409 });
+    }
+    return new Response(JSON.stringify({ error: 'Terjadi kesalahan server' }), { status: 500 });
+  }
 };
 
 export const PUT: APIRoute = async ({ locals, request }) => {
-  const { supabase, user } = locals;
-  const body = await request.json();
+  try {
+    const { user } = locals;
+    const body = await request.json();
 
-  if (!body.id) return new Response(JSON.stringify({ error: 'ID produk diperlukan' }), { status: 400 });
+    if (!body.id) return new Response(JSON.stringify({ error: 'ID produk diperlukan' }), { status: 400 });
 
-  // Verify ownership via store
-  const { data: store } = await supabase
-    .from('stores')
-    .select('id')
-    .eq('user_id', user.id)
-    .single();
+    const { rows: stores } = await query('SELECT id FROM stores WHERE user_id = $1', [user.id]);
+    if (stores.length === 0) return new Response(JSON.stringify({ error: 'Toko tidak ditemukan' }), { status: 404 });
 
-  if (!store) return new Response(JSON.stringify({ error: 'Toko tidak ditemukan' }), { status: 404 });
+    const storeId = stores[0].id;
+    const { rows } = await query(
+      `UPDATE products SET name = $1, slug = $2, description = $3, price = $4, image_url = $5, category = $6, is_available = $7, sort_order = $8
+       WHERE id = $9 AND store_id = $10 RETURNING *`,
+      [body.name, body.slug, body.description || null, body.price, body.image_url || null, body.category || null, body.is_available, body.sort_order, body.id, storeId],
+    );
 
-  const { data, error } = await supabase
-    .from('products')
-    .update({
-      name: body.name,
-      slug: body.slug,
-      description: body.description,
-      price: body.price,
-      image_url: body.image_url,
-      category: body.category,
-      is_available: body.is_available,
-      sort_order: body.sort_order,
-    })
-    .eq('id', body.id)
-    .eq('store_id', store.id)
-    .select()
-    .single();
-
-  if (error) return new Response(JSON.stringify({ error: error.message }), { status: 400 });
-  return new Response(JSON.stringify(data));
+    if (rows.length === 0) return new Response(JSON.stringify({ error: 'Produk tidak ditemukan' }), { status: 404 });
+    return new Response(JSON.stringify(rows[0]));
+  } catch (err: any) {
+    if (err?.code === '23505') {
+      return new Response(JSON.stringify({ error: 'Slug produk sudah digunakan di toko ini' }), { status: 409 });
+    }
+    return new Response(JSON.stringify({ error: 'Terjadi kesalahan server' }), { status: 500 });
+  }
 };
 
 export const DELETE: APIRoute = async ({ locals, request }) => {
-  const { supabase, user } = locals;
-  const { id } = await request.json();
+  try {
+    const { user } = locals;
+    const { id } = await request.json();
 
-  if (!id) return new Response(JSON.stringify({ error: 'ID produk diperlukan' }), { status: 400 });
+    if (!id) return new Response(JSON.stringify({ error: 'ID produk diperlukan' }), { status: 400 });
 
-  const { data: store } = await supabase
-    .from('stores')
-    .select('id')
-    .eq('user_id', user.id)
-    .single();
+    const { rows: stores } = await query('SELECT id FROM stores WHERE user_id = $1', [user.id]);
+    if (stores.length === 0) return new Response(JSON.stringify({ error: 'Toko tidak ditemukan' }), { status: 404 });
 
-  if (!store) return new Response(JSON.stringify({ error: 'Toko tidak ditemukan' }), { status: 404 });
-
-  const { error } = await supabase
-    .from('products')
-    .delete()
-    .eq('id', id)
-    .eq('store_id', store.id);
-
-  if (error) return new Response(JSON.stringify({ error: error.message }), { status: 400 });
-  return new Response(JSON.stringify({ success: true }));
+    await query('DELETE FROM products WHERE id = $1 AND store_id = $2', [id, stores[0].id]);
+    return new Response(JSON.stringify({ success: true }));
+  } catch {
+    return new Response(JSON.stringify({ error: 'Terjadi kesalahan server' }), { status: 500 });
+  }
 };

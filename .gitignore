@@ -17,6 +17,9 @@ pnpm-debug.log*
 .env
 .env.production
 
+# uploads (runtime data, not source)
+/uploads/
+
 # macOS-specific files
 .DS_Store
 

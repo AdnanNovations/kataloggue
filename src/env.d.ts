@@ -2,7 +2,6 @@
 
 declare namespace App {
   interface Locals {
-    user: import('@supabase/supabase-js').User;
-    supabase: import('@supabase/supabase-js').SupabaseClient;
+    user: import('./lib/auth').AuthUser;
   }
 }

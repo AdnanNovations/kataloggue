@@ -32,10 +32,10 @@ export function waOrderUrl(phone: string, storeName: string, productName?: strin
   return `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;
 }
 
-/** Get image URL from Supabase storage or placeholder */
+/** Get image URL - local path or placeholder */
 export function imageUrl(path: string | null, fallback = '/og-default.png'): string {
   if (!path) return fallback;
   if (path.startsWith('http')) return path;
-  const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL;
-  return `${supabaseUrl}/storage/v1/object/public/images/${path}`;
+  if (path.startsWith('/')) return path;
+  return `/${path}`;
 }

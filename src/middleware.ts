@@ -1,58 +1,29 @@
 import { defineMiddleware } from 'astro:middleware';
-import { createClient } from '@supabase/supabase-js';
+import { verifyToken } from './lib/auth';
 
 export const onRequest = defineMiddleware(async (context, next) => {
   const { pathname } = context.url;
 
-  // Only protect dashboard and API routes (except login-related)
+  // Only protect dashboard and API routes (except auth endpoints)
   const isProtected = pathname.startsWith('/dashboard') || pathname.startsWith('/api/');
-  if (!isProtected) return next();
+  const isAuthRoute = pathname.startsWith('/api/auth/') || pathname === '/api/logout';
+  const isUploadServe = pathname.startsWith('/uploads/');
+  if (!isProtected || isAuthRoute || isUploadServe) return next();
 
-  // Get auth token from cookie
-  const accessToken = context.cookies.get('sb-access-token')?.value;
-  const refreshToken = context.cookies.get('sb-refresh-token')?.value;
+  const token = context.cookies.get('auth_token')?.value;
 
-  if (!accessToken) {
+  if (!token) {
     return context.redirect('/masuk');
   }
 
-  const supabase = createClient(
-    import.meta.env.PUBLIC_SUPABASE_URL,
-    import.meta.env.PUBLIC_SUPABASE_ANON_KEY
-  );
+  const user = verifyToken(token);
 
-  const { data, error } = await supabase.auth.setSession({
-    access_token: accessToken,
-    refresh_token: refreshToken || '',
-  });
-
-  if (error || !data.user) {
-    context.cookies.delete('sb-access-token', { path: '/' });
-    context.cookies.delete('sb-refresh-token', { path: '/' });
+  if (!user) {
+    context.cookies.delete('auth_token', { path: '/' });
     return context.redirect('/masuk');
   }
 
-  // Refresh cookies if tokens were refreshed
-  if (data.session) {
-    context.cookies.set('sb-access-token', data.session.access_token, {
-      path: '/',
-      httpOnly: true,
-      secure: true,
-      sameSite: 'lax',
-      maxAge: 60 * 60 * 24 * 7, // 7 days
-    });
-    context.cookies.set('sb-refresh-token', data.session.refresh_token, {
-      path: '/',
-      httpOnly: true,
-      secure: true,
-      sameSite: 'lax',
-      maxAge: 60 * 60 * 24 * 7,
-    });
-  }
-
-  // Attach user to locals for downstream use
-  context.locals.user = data.user;
-  context.locals.supabase = supabase;
+  context.locals.user = user;
 
   return next();
 });

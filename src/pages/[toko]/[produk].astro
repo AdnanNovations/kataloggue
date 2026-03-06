@@ -5,39 +5,30 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import SEOHead from '../../components/SEOHead.astro';
 import WhatsAppButton from '../../components/catalog/WhatsAppButton.astro';
 import Footer from '../../components/Footer.astro';
-import { supabase } from '../../lib/supabase';
+import { query } from '../../lib/db';
 import { formatPrice, imageUrl } from '../../lib/utils';
 import { productJsonLd, productUrl } from '../../lib/seo';
 
 const { toko, produk } = Astro.params;
 
 // Get store
-const { data: store } = await supabase
-  .from('stores')
-  .select('*')
-  .eq('slug', toko)
-  .single();
-
+const { rows: stores } = await query('SELECT * FROM stores WHERE slug = $1', [toko]);
+const store = stores[0];
 if (!store) return Astro.redirect('/');
 
 // Get product
-const { data: product } = await supabase
-  .from('products')
-  .select('*')
-  .eq('store_id', store.id)
-  .eq('slug', produk)
-  .single();
-
+const { rows: products } = await query(
+  'SELECT * FROM products WHERE store_id = $1 AND slug = $2',
+  [store.id, produk],
+);
+const product = products[0];
 if (!product) return Astro.redirect(`/${toko}`);
 
 // Get other products from same store
-const { data: relatedProducts } = await supabase
-  .from('products')
-  .select('id, name, slug, price, image_url')
-  .eq('store_id', store.id)
-  .neq('id', product.id)
-  .eq('is_available', true)
-  .limit(4);
+const { rows: relatedProducts } = await query(
+  'SELECT id, name, slug, price, image_url FROM products WHERE store_id = $1 AND id != $2 AND is_available = true LIMIT 4',
+  [store.id, product.id],
+);
 
 // Build dynamic site URL
 const host = Astro.request.headers.get('x-forwarded-host') || Astro.request.headers.get('host') || 'kataloggue.my.id';

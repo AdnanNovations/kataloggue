@@ -7,9 +7,6 @@ RUN npm ci
 
 COPY . .
 
-ARG PUBLIC_SUPABASE_URL
-ARG PUBLIC_SUPABASE_ANON_KEY
-
 RUN npm run build
 
 FROM node:22-alpine AS runtime
@@ -18,6 +15,8 @@ WORKDIR /app
 
 COPY --from=build /app/dist ./dist
 COPY --from=build /app/node_modules ./node_modules
+
+RUN mkdir -p /app/uploads
 
 ENV HOST=0.0.0.0
 ENV PORT=4321

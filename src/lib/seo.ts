@@ -1,4 +1,4 @@
-import type { Store, Product } from './supabase';
+import type { Store, Product } from './db';
 import { formatPrice, imageUrl } from './utils';
 
 const SITE_URL = 'https://kataloggue.my.id';

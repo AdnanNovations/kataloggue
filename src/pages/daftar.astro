@@ -77,13 +77,6 @@ import Footer from '../components/Footer.astro';
 </BaseLayout>
 
 <script>
-  import { createClient } from '@supabase/supabase-js';
-
-  const supabase = createClient(
-    import.meta.env.PUBLIC_SUPABASE_URL,
-    import.meta.env.PUBLIC_SUPABASE_ANON_KEY
-  );
-
   const form = document.getElementById('register-form') as HTMLFormElement;
   const messageEl = document.getElementById('auth-message') as HTMLDivElement;
 
@@ -99,20 +92,22 @@ import Footer from '../components/Footer.astro';
     const email = (form.querySelector('#email') as HTMLInputElement).value;
     const password = (form.querySelector('#password') as HTMLInputElement).value;
 
-    const { error } = await supabase.auth.signUp({ email, password });
+    try {
+      const res = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+      const data = await res.json();
 
-    if (error) {
-      showMessage(error.message);
-      return;
-    }
+      if (!res.ok) {
+        showMessage(data.error || 'Pendaftaran gagal');
+        return;
+      }
 
-    const { data: { session } } = await supabase.auth.getSession();
-    if (session) {
-      document.cookie = `sb-access-token=${session.access_token}; path=/; max-age=${60*60*24*7}; secure; samesite=lax`;
-      document.cookie = `sb-refresh-token=${session.refresh_token}; path=/; max-age=${60*60*24*7}; secure; samesite=lax`;
       window.location.href = '/dashboard';
-    } else {
-      showMessage('Berhasil! Cek email Anda untuk verifikasi.', false);
+    } catch {
+      showMessage('Terjadi kesalahan. Coba lagi.');
     }
   });
 </script>
