@@ -1,0 +1,47 @@
+---
+const features = [
+  {
+    icon: '&#128722;', // shopping cart
+    title: 'Katalog Profesional',
+    description: 'Tampilan modern dan responsif. Produk Anda terlihat profesional di HP maupun laptop pelanggan.',
+  },
+  {
+    icon: '&#128172;', // speech bubble
+    title: 'Order via WhatsApp',
+    description: 'Pelanggan langsung terhubung ke WhatsApp Anda dengan pesan otomatis. Tanpa perlu sistem pembayaran rumit.',
+  },
+  {
+    icon: '&#127760;', // globe
+    title: 'Muncul di Google',
+    description: 'Katalog Anda dioptimasi SEO agar mudah ditemukan calon pembeli di Google. Gratis promosi 24 jam!',
+  },
+  {
+    icon: '&#9889;', // lightning
+    title: 'Super Cepat',
+    description: 'Website ringan dan cepat diakses. Bahkan dengan koneksi internet yang lambat sekalipun.',
+  },
+];
+---
+
+<section class="py-20 bg-white" id="fitur">
+  <div class="max-w-6xl mx-auto px-4">
+    <div class="text-center mb-16">
+      <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+        Semua yang UMKM Butuhkan
+      </h2>
+      <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+        Fitur lengkap untuk menampilkan dan menjual produk Anda secara online.
+      </p>
+    </div>
+
+    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+      {features.map(feature => (
+        <div class="text-center p-6">
+          <div class="text-4xl mb-4" set:html={feature.icon} />
+          <h3 class="text-lg font-semibold text-gray-900 mb-2">{feature.title}</h3>
+          <p class="text-gray-600 text-sm">{feature.description}</p>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>

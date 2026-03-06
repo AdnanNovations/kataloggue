@@ -1,0 +1,43 @@
+---
+export const prerender = false;
+---
+
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <title>Memproses login...</title>
+  </head>
+  <body>
+    <p style="text-align:center;margin-top:4rem;font-family:sans-serif">Memproses login...</p>
+    <script>
+      import { createClient } from '@supabase/supabase-js';
+
+      const supabase = createClient(
+        import.meta.env.PUBLIC_SUPABASE_URL,
+        import.meta.env.PUBLIC_SUPABASE_ANON_KEY
+      );
+
+      // Supabase puts tokens in the URL hash after email confirmation
+      const hashParams = new URLSearchParams(window.location.hash.substring(1));
+      const accessToken = hashParams.get('access_token');
+      const refreshToken = hashParams.get('refresh_token');
+
+      if (accessToken && refreshToken) {
+        const { data, error } = await supabase.auth.setSession({
+          access_token: accessToken,
+          refresh_token: refreshToken,
+        });
+
+        if (data.session) {
+          document.cookie = `sb-access-token=${data.session.access_token}; path=/; max-age=${60*60*24*7}; secure; samesite=lax`;
+          document.cookie = `sb-refresh-token=${data.session.refresh_token}; path=/; max-age=${60*60*24*7}; secure; samesite=lax`;
+          window.location.href = '/dashboard';
+        } else {
+          window.location.href = '/masuk';
+        }
+      } else {
+        window.location.href = '/masuk';
+      }
+    </script>
+  </body>
+</html>

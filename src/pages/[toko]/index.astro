@@ -1,0 +1,92 @@
+---
+export const prerender = false;
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SEOHead from '../../components/SEOHead.astro';
+import StoreHeader from '../../components/catalog/StoreHeader.astro';
+import CategoryFilter from '../../components/catalog/CategoryFilter.astro';
+import ProductGrid from '../../components/catalog/ProductGrid.astro';
+import WhatsAppButton from '../../components/catalog/WhatsAppButton.astro';
+import Footer from '../../components/Footer.astro';
+import { supabase } from '../../lib/supabase';
+import { storeJsonLd, storeUrl } from '../../lib/seo';
+
+const { toko } = Astro.params;
+const activeCategory = Astro.url.searchParams.get('kategori') || undefined;
+
+// Get store by slug
+const { data: store } = await supabase
+  .from('stores')
+  .select('*')
+  .eq('slug', toko)
+  .single();
+
+if (!store) {
+  return Astro.redirect('/');
+}
+
+// Get products
+let query = supabase
+  .from('products')
+  .select('*')
+  .eq('store_id', store.id)
+  .order('sort_order', { ascending: true })
+  .order('created_at', { ascending: false });
+
+if (activeCategory) {
+  query = query.eq('category', activeCategory);
+}
+
+const { data: products } = await query;
+const allProducts = products || [];
+
+// Get unique categories (from all products, not filtered)
+const { data: allProds } = await supabase
+  .from('products')
+  .select('category')
+  .eq('store_id', store.id)
+  .not('category', 'is', null);
+
+const categories = [...new Set(allProds?.map(p => p.category).filter(Boolean) as string[])];
+
+// Cache for 5 minutes
+Astro.response.headers.set('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=600');
+---
+
+<BaseLayout>
+  <Fragment slot="head">
+    <SEOHead
+      title={`${store.name} - Katalog Produk Online`}
+      description={store.description || `Lihat katalog produk ${store.name}. Order mudah via WhatsApp.`}
+      url={storeUrl(store.slug)}
+      image={store.logo_url || undefined}
+      jsonLd={storeJsonLd(store)}
+    />
+  </Fragment>
+
+  <StoreHeader store={store} productCount={allProducts.length} />
+
+  <main class="max-w-5xl mx-auto px-3 sm:px-4 py-4 sm:py-8 pb-24 md:pb-8">
+    <CategoryFilter
+      categories={categories}
+      storeSlug={store.slug}
+      activeCategory={activeCategory}
+    />
+
+    <ProductGrid products={allProducts} storeSlug={store.slug} />
+  </main>
+
+  <!-- Mobile WhatsApp sticky button -->
+  <div class="md:hidden fixed bottom-4 left-4 right-4 z-40">
+    <WhatsAppButton
+      phone={store.wa_number}
+      storeName={store.name}
+      size="lg"
+      class="w-full shadow-xl"
+    >
+      Hubungi via WhatsApp
+    </WhatsAppButton>
+  </div>
+
+  <Footer showBadge={true} />
+</BaseLayout>

@@ -1,0 +1,100 @@
+---
+export const prerender = false;
+
+import DashboardLayout from '../../layouts/DashboardLayout.astro';
+import { supabase } from '../../lib/supabase';
+
+const user = Astro.locals.user;
+
+// Get store data
+const { data: store } = await supabase
+  .from('stores')
+  .select('*')
+  .eq('user_id', user.id)
+  .single();
+
+// Get product count
+const { count: productCount } = await supabase
+  .from('products')
+  .select('*', { count: 'exact', head: true })
+  .eq('store_id', store?.id || '');
+
+const hasStore = !!store;
+const host = Astro.request.headers.get('x-forwarded-host') || Astro.request.headers.get('host') || 'kataloggue.my.id';
+const siteUrl = `https://${host}`;
+---
+
+<DashboardLayout title="Dashboard">
+  {!hasStore ? (
+    <div class="bg-white rounded-xl shadow-md p-8 text-center max-w-lg mx-auto">
+      <div class="text-5xl mb-4">&#127978;</div>
+      <h2 class="text-xl font-bold text-gray-900 mb-2">Selamat Datang!</h2>
+      <p class="text-gray-500 mb-6">Mulai dengan membuat toko online Anda terlebih dahulu.</p>
+      <a
+        href="/dashboard/pengaturan"
+        class="inline-block bg-green-600 text-white px-6 py-2.5 rounded-lg font-semibold hover:bg-green-700 transition-colors"
+      >
+        Buat Toko Sekarang
+      </a>
+    </div>
+  ) : (
+    <div class="grid md:grid-cols-3 gap-6">
+      <!-- Store Info Card -->
+      <div class="bg-white rounded-xl shadow-md p-6">
+        <div class="text-sm text-gray-500 mb-1">Toko Anda</div>
+        <div class="text-xl font-bold text-gray-900">{store.name}</div>
+        <a
+          href={`/${store.slug}`}
+          class="inline-block mt-3 text-sm text-green-600 hover:underline"
+          target="_blank"
+        >
+          Lihat Katalog &rarr;
+        </a>
+      </div>
+
+      <!-- Products Count Card -->
+      <div class="bg-white rounded-xl shadow-md p-6">
+        <div class="text-sm text-gray-500 mb-1">Total Produk</div>
+        <div class="text-3xl font-bold text-gray-900">{productCount || 0}</div>
+        <a
+          href="/dashboard/produk"
+          class="inline-block mt-3 text-sm text-green-600 hover:underline"
+        >
+          Kelola Produk &rarr;
+        </a>
+      </div>
+
+      <!-- Quick Actions Card -->
+      <div class="bg-white rounded-xl shadow-md p-6">
+        <div class="text-sm text-gray-500 mb-3">Bagikan Katalog</div>
+        <div class="flex flex-col gap-2">
+          <button
+            id="copy-link"
+            data-url={`${siteUrl}/${store.slug}`}
+            class="text-left px-4 py-2 bg-gray-50 rounded-lg text-sm hover:bg-gray-100 transition-colors"
+          >
+            &#128203; Salin Link Katalog
+          </button>
+          <a
+            href={`https://wa.me/?text=${encodeURIComponent(`Cek katalog produk kami: ${siteUrl}/${store.slug}`)}`}
+            target="_blank"
+            class="px-4 py-2 bg-green-50 text-green-700 rounded-lg text-sm hover:bg-green-100 transition-colors"
+          >
+            &#128172; Bagikan via WhatsApp
+          </a>
+        </div>
+      </div>
+    </div>
+  )}
+</DashboardLayout>
+
+<script>
+  const copyBtn = document.getElementById('copy-link');
+  copyBtn?.addEventListener('click', async () => {
+    const url = copyBtn.getAttribute('data-url') || '';
+    await navigator.clipboard.writeText(url);
+    const original = copyBtn.innerHTML;
+    copyBtn.textContent = 'Tersalin!';
+    setTimeout(() => { copyBtn.innerHTML = original; }, 2000);
+  });
+</script>

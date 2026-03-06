@@ -1,0 +1,22 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  class?: string;
+}
+
+const { class: className = '' } = Astro.props;
+---
+
+<!doctype html>
+<html lang="id">
+  <head>
+    <slot name="head" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  </head>
+  <body class={`min-h-screen flex flex-col font-sans text-gray-900 bg-white ${className}`}>
+    <slot />
+  </body>
+</html>

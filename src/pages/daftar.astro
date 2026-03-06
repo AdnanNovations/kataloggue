@@ -1,0 +1,118 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SEOHead from '../components/SEOHead.astro';
+import Footer from '../components/Footer.astro';
+---
+
+<BaseLayout>
+  <Fragment slot="head">
+    <SEOHead
+      title="Daftar Gratis"
+      description="Daftar gratis di KatalogGue dan buat katalog produk online untuk UMKM Anda dalam 5 menit."
+      url="https://kataloggue.my.id/daftar"
+      noindex={true}
+    />
+  </Fragment>
+
+  <div class="flex-1 flex items-center justify-center px-4 py-12">
+    <div class="w-full max-w-md">
+      <div class="text-center mb-8">
+        <a href="/" class="inline-flex items-center gap-2 font-bold text-2xl text-primary mb-4">
+          <svg class="w-10 h-10" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="64" height="64" rx="12" fill="#16a34a"/>
+            <text x="32" y="44" font-family="Arial" font-size="36" font-weight="bold" fill="white" text-anchor="middle">G</text>
+          </svg>
+          KatalogGue
+        </a>
+        <h1 class="text-2xl font-bold text-gray-900">Buat Akun Gratis</h1>
+        <p class="text-gray-500 mt-2">Mulai buat katalog online dalam 5 menit</p>
+      </div>
+
+      <div class="bg-white p-8 rounded-xl shadow-md">
+        <div id="auth-message" class="hidden mb-4 p-3 rounded-lg text-sm"></div>
+
+        <form id="register-form" class="space-y-4">
+          <div>
+            <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              required
+              placeholder="nama@email.com"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
+            />
+          </div>
+
+          <div>
+            <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+            <input
+              id="password"
+              name="password"
+              type="password"
+              required
+              minlength="6"
+              placeholder="Minimal 6 karakter"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
+            />
+          </div>
+
+          <button
+            type="submit"
+            class="w-full bg-primary text-white py-2.5 rounded-lg font-semibold hover:bg-primary-dark transition-colors"
+          >
+            Daftar Sekarang
+          </button>
+        </form>
+
+        <div class="mt-6 text-center text-sm text-gray-500">
+          Sudah punya akun?
+          <a href="/masuk" class="text-primary font-medium hover:underline">Masuk</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <Footer />
+</BaseLayout>
+
+<script>
+  import { createClient } from '@supabase/supabase-js';
+
+  const supabase = createClient(
+    import.meta.env.PUBLIC_SUPABASE_URL,
+    import.meta.env.PUBLIC_SUPABASE_ANON_KEY
+  );
+
+  const form = document.getElementById('register-form') as HTMLFormElement;
+  const messageEl = document.getElementById('auth-message') as HTMLDivElement;
+
+  function showMessage(text: string, isError = true) {
+    messageEl.textContent = text;
+    messageEl.className = `mb-4 p-3 rounded-lg text-sm ${
+      isError ? 'bg-red-50 text-red-700' : 'bg-green-50 text-green-700'
+    }`;
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = (form.querySelector('#email') as HTMLInputElement).value;
+    const password = (form.querySelector('#password') as HTMLInputElement).value;
+
+    const { error } = await supabase.auth.signUp({ email, password });
+
+    if (error) {
+      showMessage(error.message);
+      return;
+    }
+
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session) {
+      document.cookie = `sb-access-token=${session.access_token}; path=/; max-age=${60*60*24*7}; secure; samesite=lax`;
+      document.cookie = `sb-refresh-token=${session.refresh_token}; path=/; max-age=${60*60*24*7}; secure; samesite=lax`;
+      window.location.href = '/dashboard';
+    } else {
+      showMessage('Berhasil! Cek email Anda untuk verifikasi.', false);
+    }
+  });
+</script>

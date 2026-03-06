@@ -1,0 +1,41 @@
+---
+interface Props {
+  categories: string[];
+  storeSlug: string;
+  activeCategory?: string;
+}
+
+const { categories, storeSlug, activeCategory } = Astro.props;
+---
+
+{categories.length > 0 && (
+  <div class="flex flex-nowrap sm:flex-wrap gap-2 mb-4 sm:mb-6 overflow-x-auto pb-2 sm:pb-0 -mx-3 px-3 sm:mx-0 sm:px-0 scrollbar-hide">
+    <a
+      href={`/${storeSlug}`}
+      class={`px-3 sm:px-4 py-1.5 rounded-full text-xs sm:text-sm font-medium transition-colors whitespace-nowrap flex-shrink-0 ${
+        !activeCategory
+          ? 'bg-green-600 text-white'
+          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+      }`}
+    >
+      Semua
+    </a>
+    {categories.map(cat => (
+      <a
+        href={`/${storeSlug}?kategori=${encodeURIComponent(cat)}`}
+        class={`px-3 sm:px-4 py-1.5 rounded-full text-xs sm:text-sm font-medium transition-colors whitespace-nowrap flex-shrink-0 ${
+          activeCategory === cat
+            ? 'bg-green-600 text-white'
+            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+        }`}
+      >
+        {cat}
+      </a>
+    ))}
+  </div>
+)}
+
+<style>
+  .scrollbar-hide::-webkit-scrollbar { display: none; }
+  .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+</style>

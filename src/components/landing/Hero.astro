@@ -1,0 +1,39 @@
+---
+import Button from '../ui/Button.astro';
+---
+
+<section class="relative overflow-hidden bg-gradient-to-br from-green-50 via-white to-emerald-50">
+  <div class="max-w-6xl mx-auto px-4 py-20 md:py-32">
+    <div class="max-w-3xl mx-auto text-center">
+      <div class="inline-flex items-center gap-2 px-4 py-1.5 bg-green-100 text-green-800 rounded-full text-sm font-medium mb-6">
+        100% Gratis untuk UMKM Indonesia
+      </div>
+
+      <h1 class="text-4xl md:text-6xl font-extrabold tracking-tight text-gray-900 mb-6">
+        Buat Katalog Online
+        <span class="text-primary"> dalam 5 Menit</span>
+      </h1>
+
+      <p class="text-lg md:text-xl text-gray-600 mb-10 max-w-2xl mx-auto">
+        Tampilkan produk UMKM Anda secara profesional. Pelanggan bisa langsung order via WhatsApp. Tanpa biaya, tanpa ribet.
+      </p>
+
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <Button href="/daftar" size="lg" variant="primary">
+          Buat Katalog Gratis
+        </Button>
+        <Button href="#cara-kerja" size="lg" variant="outline">
+          Lihat Cara Kerja
+        </Button>
+      </div>
+
+      <p class="mt-6 text-sm text-gray-400">
+        Sudah digunakan oleh 500+ UMKM di seluruh Indonesia
+      </p>
+    </div>
+  </div>
+
+  <!-- Decorative gradient blob -->
+  <div class="absolute -top-40 -right-40 w-80 h-80 bg-green-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30"></div>
+  <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-emerald-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30"></div>
+</section>

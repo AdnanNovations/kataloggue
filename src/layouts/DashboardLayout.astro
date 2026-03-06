@@ -1,0 +1,72 @@
+---
+import '../styles/global.css';
+import SEOHead from '../components/SEOHead.astro';
+
+interface Props {
+  title: string;
+}
+
+const { title } = Astro.props;
+const currentPath = Astro.url.pathname;
+
+const navItems = [
+  { href: '/dashboard', label: 'Dashboard', icon: 'home' },
+  { href: '/dashboard/produk', label: 'Produk', icon: 'box' },
+  { href: '/dashboard/pengaturan', label: 'Pengaturan', icon: 'settings' },
+];
+---
+
+<!doctype html>
+<html lang="id">
+  <head>
+    <SEOHead
+      title={title}
+      description="Dashboard KatalogGue"
+      url={`https://kataloggue.my.id${currentPath}`}
+      noindex={true}
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  </head>
+  <body class="min-h-screen bg-gray-50 font-sans text-gray-900">
+    <!-- Top Nav -->
+    <nav class="bg-white border-b border-gray-200 sticky top-0 z-50">
+      <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+        <a href="/dashboard" class="flex items-center gap-2 font-bold text-xl text-primary">
+          <svg class="w-8 h-8" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="64" height="64" rx="12" fill="#16a34a"/>
+            <text x="32" y="44" font-family="Arial" font-size="36" font-weight="bold" fill="white" text-anchor="middle">G</text>
+          </svg>
+          KatalogGue
+        </a>
+
+        <div class="flex items-center gap-6">
+          {navItems.map(item => (
+            <a
+              href={item.href}
+              class={`text-sm font-medium transition-colors ${
+                currentPath === item.href
+                  ? 'text-primary'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              {item.label}
+            </a>
+          ))}
+          <form method="POST" action="/api/logout">
+            <button type="submit" class="text-sm text-gray-500 hover:text-red-600 transition-colors">
+              Keluar
+            </button>
+          </form>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-6xl mx-auto px-4 py-8">
+      <h1 class="text-2xl font-bold mb-6">{title}</h1>
+      <slot />
+    </main>
+  </body>
+</html>

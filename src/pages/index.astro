@@ -1,0 +1,47 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SEOHead from '../components/SEOHead.astro';
+import Hero from '../components/landing/Hero.astro';
+import Features from '../components/landing/Features.astro';
+import HowItWorks from '../components/landing/HowItWorks.astro';
+import CTA from '../components/landing/CTA.astro';
+import Footer from '../components/Footer.astro';
+---
+
+<BaseLayout>
+  <Fragment slot="head">
+    <SEOHead
+      title="KatalogGue - Buat Katalog Online Gratis untuk UMKM"
+      description="Buat katalog produk online gratis untuk UMKM Indonesia. Pelanggan bisa langsung order via WhatsApp. Tanpa biaya, tampil profesional, muncul di Google."
+      url="https://kataloggue.my.id"
+    />
+  </Fragment>
+
+  <!-- Navbar -->
+  <nav class="bg-white/80 backdrop-blur-md border-b border-gray-100 sticky top-0 z-50">
+    <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+      <a href="/" class="flex items-center gap-2 font-bold text-xl text-primary">
+        <svg class="w-8 h-8" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="64" height="64" rx="12" fill="#16a34a"/>
+          <text x="32" y="44" font-family="Arial" font-size="36" font-weight="bold" fill="white" text-anchor="middle">G</text>
+        </svg>
+        KatalogGue
+      </a>
+
+      <div class="flex items-center gap-4">
+        <a href="/masuk" class="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">
+          Masuk
+        </a>
+        <a href="/daftar" class="text-sm font-medium bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary-dark transition-colors">
+          Daftar Gratis
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <Hero />
+  <Features />
+  <HowItWorks />
+  <CTA />
+  <Footer />
+</BaseLayout>

@@ -1,0 +1,28 @@
+---
+interface Props {
+  showBadge?: boolean;
+}
+
+const { showBadge = false } = Astro.props;
+const year = new Date().getFullYear();
+---
+
+<footer class="bg-gray-50 border-t border-gray-200 mt-auto">
+  <div class="max-w-6xl mx-auto px-4 py-8 text-center text-sm text-gray-500">
+    {showBadge && (
+      <a
+        href="https://kataloggue.my.id"
+        class="inline-flex items-center gap-1.5 mb-4 px-4 py-2 bg-white border border-gray-200 rounded-full text-gray-600 hover:text-primary hover:border-primary transition-colors text-sm"
+        target="_blank"
+        rel="noopener"
+      >
+        <svg class="w-4 h-4" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="64" height="64" rx="12" fill="#16a34a"/>
+          <text x="32" y="44" font-family="Arial" font-size="36" font-weight="bold" fill="white" text-anchor="middle">G</text>
+        </svg>
+        Dibuat dengan KatalogGue - Gratis!
+      </a>
+    )}
+    <p>&copy; {year} KatalogGue. Katalog online gratis untuk UMKM Indonesia.</p>
+  </div>
+</footer>

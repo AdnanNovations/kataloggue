@@ -1,0 +1,46 @@
+---
+const steps = [
+  {
+    number: '1',
+    title: 'Daftar & Buat Toko',
+    description: 'Daftar gratis, pilih nama toko dan masukkan nomor WhatsApp Anda.',
+  },
+  {
+    number: '2',
+    title: 'Tambah Produk',
+    description: 'Upload foto, tulis nama produk, harga, dan deskripsi. Bisa tambah kategori.',
+  },
+  {
+    number: '3',
+    title: 'Bagikan Link',
+    description: 'Katalog Anda siap! Bagikan link ke pelanggan via WhatsApp, Instagram, atau media sosial lainnya.',
+  },
+];
+---
+
+<section class="py-20 bg-gray-50" id="cara-kerja">
+  <div class="max-w-4xl mx-auto px-4">
+    <div class="text-center mb-16">
+      <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+        Cara Kerja
+      </h2>
+      <p class="text-lg text-gray-600">
+        Tiga langkah mudah untuk membuat katalog online Anda.
+      </p>
+    </div>
+
+    <div class="space-y-12">
+      {steps.map((step, i) => (
+        <div class="flex gap-6 items-start">
+          <div class="flex-shrink-0 w-12 h-12 bg-primary text-white rounded-full flex items-center justify-center text-xl font-bold">
+            {step.number}
+          </div>
+          <div>
+            <h3 class="text-xl font-semibold text-gray-900 mb-2">{step.title}</h3>
+            <p class="text-gray-600">{step.description}</p>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>

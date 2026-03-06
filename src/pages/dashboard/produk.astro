@@ -1,0 +1,36 @@
+---
+export const prerender = false;
+
+import DashboardLayout from '../../layouts/DashboardLayout.astro';
+import ProductList from '../../components/dashboard/ProductList';
+import { supabase } from '../../lib/supabase';
+
+const user = Astro.locals.user;
+
+// Get store
+const { data: store } = await supabase
+  .from('stores')
+  .select('*')
+  .eq('user_id', user.id)
+  .single();
+
+if (!store) {
+  return Astro.redirect('/dashboard/pengaturan');
+}
+
+// Get products
+const { data: products } = await supabase
+  .from('products')
+  .select('*')
+  .eq('store_id', store.id)
+  .order('sort_order', { ascending: true })
+  .order('created_at', { ascending: false });
+---
+
+<DashboardLayout title="Produk">
+  <ProductList
+    client:load
+    initialProducts={products || []}
+    storeSlug={store.slug}
+  />
+</DashboardLayout>

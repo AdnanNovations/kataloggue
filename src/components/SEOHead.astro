@@ -1,0 +1,49 @@
+---
+interface Props {
+  title: string;
+  description: string;
+  url: string;
+  image?: string;
+  jsonLd?: string;
+  noindex?: boolean;
+}
+
+const {
+  title,
+  description,
+  url,
+  image = '/og-default.png',
+  jsonLd,
+  noindex = false,
+} = Astro.props;
+
+const siteName = 'KatalogGue';
+const fullTitle = title.includes(siteName) ? title : `${title} | ${siteName}`;
+const absoluteImage = image.startsWith('http') ? image : `https://kataloggue.my.id${image}`;
+---
+
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+<title>{fullTitle}</title>
+<meta name="description" content={description} />
+{noindex && <meta name="robots" content="noindex,nofollow" />}
+<link rel="canonical" href={url} />
+
+<!-- Open Graph -->
+<meta property="og:type" content="website" />
+<meta property="og:title" content={fullTitle} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={url} />
+<meta property="og:image" content={absoluteImage} />
+<meta property="og:site_name" content={siteName} />
+<meta property="og:locale" content="id_ID" />
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={fullTitle} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={absoluteImage} />
+
+{jsonLd && <script type="application/ld+json" set:html={jsonLd} />}
