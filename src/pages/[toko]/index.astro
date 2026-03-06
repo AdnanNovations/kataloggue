@@ -12,6 +12,12 @@ import { query } from '../../lib/db';
 import { storeJsonLd, storeUrl } from '../../lib/seo';
 
 const { toko } = Astro.params;
+
+// Skip paths with dots (e.g. sitemap.xml, robots.txt)
+if (!toko || toko.includes('.')) {
+  return new Response(null, { status: 404 });
+}
+
 const activeCategory = Astro.url.searchParams.get('kategori') || undefined;
 
 // Get store by slug
@@ -19,7 +25,7 @@ const { rows: stores } = await query('SELECT * FROM stores WHERE slug = $1', [to
 const store = stores[0];
 
 if (!store) {
-  return Astro.redirect('/');
+  return new Response(null, { status: 404 });
 }
 
 // Get products (with optional category filter)
