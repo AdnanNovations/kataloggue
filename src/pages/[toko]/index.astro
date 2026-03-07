@@ -36,7 +36,7 @@ let productsQuery: string;
 let productsParams: any[];
 
 if (activeCategory) {
-  productsQuery = 'SELECT * FROM products WHERE store_id = $1 AND category = $2 ORDER BY sort_order ASC, created_at DESC';
+  productsQuery = 'SELECT * FROM products WHERE store_id = $1 AND EXISTS (SELECT 1 FROM unnest(string_to_array(category, \',\')) AS c WHERE trim(c) = $2) ORDER BY sort_order ASC, created_at DESC';
   productsParams = [store.id, activeCategory];
 } else {
   productsQuery = 'SELECT * FROM products WHERE store_id = $1 ORDER BY sort_order ASC, created_at DESC';
@@ -47,7 +47,9 @@ const { rows: allProducts } = await query(productsQuery, productsParams);
 
 // Get unique categories (from all products, not filtered)
 const { rows: catRows } = await query(
-  'SELECT DISTINCT category FROM products WHERE store_id = $1 AND category IS NOT NULL',
+  `SELECT DISTINCT trim(cat) AS category
+   FROM products, unnest(string_to_array(category, ',')) AS cat
+   WHERE store_id = $1 AND category IS NOT NULL`,
   [store.id],
 );
 const categories = catRows.map(r => r.category as string);

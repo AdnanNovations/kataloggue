@@ -103,7 +103,11 @@ Astro.response.headers.set('Cache-Control', 'public, s-maxage=300, stale-while-r
       <!-- Product Info -->
       <div>
         {product.category && (
-          <span class="text-xs sm:text-sm uppercase tracking-wide" style="color:var(--cs-category-label)">{product.category}</span>
+          <div class="flex flex-wrap gap-1.5">
+            {product.category.split(',').map(cat => cat.trim()).filter(Boolean).map(cat => (
+              <span class="text-xs sm:text-sm uppercase tracking-wide px-2 py-0.5 rounded" style="color:var(--cs-category-label);background:var(--cs-page-bg, #f3f4f6)">{cat}</span>
+            ))}
+          </div>
         )}
         <h1 class="text-xl sm:text-2xl md:text-3xl font-bold mt-1" style="color:var(--cs-product-name)">{product.name}</h1>
 

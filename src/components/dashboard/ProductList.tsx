@@ -131,7 +131,11 @@ export default function ProductList({ initialProducts, storeSlug }: Props) {
                 <p className="text-green-600 font-semibold">{formatPrice(product.price)}</p>
                 <div className="flex items-center gap-2 flex-wrap">
                   {product.category && (
-                    <span className="text-xs text-gray-400">{product.category}</span>
+                    <span className="flex flex-wrap gap-1">
+                      {product.category.split(',').map(cat => cat.trim()).filter(Boolean).map((cat, i) => (
+                        <span key={i} className="text-xs text-gray-500 bg-gray-100 px-1.5 py-0.5 rounded">{cat}</span>
+                      ))}
+                    </span>
                   )}
                   {(product.review_count ?? 0) > 0 && (
                     <span className="flex items-center gap-1 text-xs text-gray-500">
