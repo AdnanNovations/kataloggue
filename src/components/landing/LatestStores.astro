@@ -1,4 +1,6 @@
 ---
+import { imageUrl } from '../../lib/utils';
+
 interface Props {
   stores: {
     name: string;
@@ -33,7 +35,7 @@ function timeAgo(dateStr: string): string {
           <div class="flex items-center gap-3 mb-3">
             {store.logo_url ? (
               <img
-                src={store.logo_url.startsWith('http') ? store.logo_url : `/${store.logo_url}`}
+                src={imageUrl(store.logo_url)}
                 alt={store.name}
                 class="w-10 h-10 rounded-lg object-cover flex-shrink-0"
                 loading="lazy"
