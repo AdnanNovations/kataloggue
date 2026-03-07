@@ -1,6 +1,6 @@
 ---
 interface Props {
-  variant?: 'primary' | 'secondary' | 'outline' | 'whatsapp';
+  variant?: 'primary' | 'secondary' | 'outline' | 'outline-light' | 'whatsapp';
   size?: 'sm' | 'md' | 'lg';
   href?: string;
   class?: string;
@@ -16,6 +16,7 @@ const variants: Record<string, string> = {
   primary: 'bg-primary text-white hover:bg-primary-dark focus:ring-primary',
   secondary: 'bg-secondary text-white hover:bg-amber-600 focus:ring-secondary',
   outline: 'border-2 border-primary text-primary hover:bg-primary hover:text-white focus:ring-primary',
+  'outline-light': 'border-2 border-white/40 text-white hover:bg-white/15 focus:ring-white',
   whatsapp: 'bg-wa-green text-white hover:bg-green-600 focus:ring-wa-green',
 };
 
