@@ -1,5 +1,11 @@
 @import "tailwindcss";
 
+@layer base {
+  a, button, [role="button"], input[type="submit"], input[type="button"], select, label[for] {
+    cursor: pointer;
+  }
+}
+
 @theme {
   --color-primary: #16a34a;
   --color-primary-dark: #15803d;
