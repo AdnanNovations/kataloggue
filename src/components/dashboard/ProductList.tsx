@@ -13,6 +13,7 @@ interface Product {
   is_available: boolean;
   avg_rating?: number;
   review_count?: number;
+  visitor_count?: number;
 }
 
 interface Props {
@@ -136,6 +137,11 @@ export default function ProductList({ initialProducts, storeSlug }: Props) {
                     <span className="flex items-center gap-1 text-xs text-gray-500">
                       <StarRating rating={Math.round(product.avg_rating ?? 0)} size="sm" />
                       ({product.review_count})
+                    </span>
+                  )}
+                  {(product.visitor_count ?? 0) > 0 && (
+                    <span className="text-xs text-blue-600">
+                      {product.visitor_count} pengunjung
                     </span>
                   )}
                 </div>
