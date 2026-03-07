@@ -61,3 +61,12 @@ export interface ProductReview {
   comment: string | null;
   created_at: string;
 }
+
+export interface PageView {
+  id: string;
+  store_id: string;
+  product_id: string | null;
+  visitor_hash: string;
+  page_type: 'store' | 'product';
+  created_at: string;
+}

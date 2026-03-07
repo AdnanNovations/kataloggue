@@ -122,4 +122,13 @@ Astro.response.headers.set('Cache-Control', 'public, s-maxage=300, stale-while-r
       </div>
     );
   })()}
+
+  <script define:vars={{ storeId: store.id }}>
+    fetch('/api/track', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ store_id: storeId, page_type: 'store' }),
+      keepalive: true,
+    }).catch(() => {});
+  </script>
 </BaseLayout>

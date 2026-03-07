@@ -70,6 +70,16 @@ CREATE TABLE IF NOT EXISTS product_reviews (
   created_at TIMESTAMPTZ DEFAULT now()
 );
 
+-- Page views (visitor tracking)
+CREATE TABLE IF NOT EXISTS page_views (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  store_id UUID REFERENCES stores(id) ON DELETE CASCADE NOT NULL,
+  product_id UUID REFERENCES products(id) ON DELETE SET NULL,
+  visitor_hash TEXT NOT NULL,
+  page_type TEXT NOT NULL CHECK (page_type IN ('store', 'product')),
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
 -- Indexes
 CREATE INDEX idx_stores_slug ON stores(slug);
 CREATE INDEX idx_stores_user_id ON stores(user_id);
@@ -78,3 +88,7 @@ CREATE INDEX idx_products_category ON products(category);
 CREATE INDEX idx_store_reviews_store_id ON store_reviews(store_id);
 CREATE INDEX idx_product_reviews_product_id ON product_reviews(product_id);
 CREATE INDEX idx_product_reviews_store_id ON product_reviews(store_id);
+CREATE INDEX idx_page_views_store_id ON page_views(store_id);
+CREATE INDEX idx_page_views_product_id ON page_views(product_id);
+CREATE INDEX idx_page_views_dedup ON page_views(visitor_hash, store_id, product_id);
+CREATE INDEX idx_page_views_created ON page_views(created_at);

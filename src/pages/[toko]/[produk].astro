@@ -210,6 +210,15 @@ Astro.response.headers.set('Cache-Control', 'public, s-maxage=300, stale-while-r
   })()}
 </BaseLayout>
 
+<script define:vars={{ storeId: store.id, productId: product.id }}>
+  fetch('/api/track', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ store_id: storeId, product_id: productId, page_type: 'product' }),
+    keepalive: true,
+  }).catch(() => {});
+</script>
+
 <script>
   const copyBtn = document.getElementById('copy-link');
   copyBtn?.addEventListener('click', async () => {

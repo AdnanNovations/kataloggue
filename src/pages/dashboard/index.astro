@@ -34,6 +34,16 @@ if (store) {
   reviewAvg = parseFloat(reviewRows[0].avg_rating);
 }
 
+// Get visitor count
+let visitorCount = 0;
+if (store) {
+  const { rows: visitorRows } = await query(
+    'SELECT COUNT(DISTINCT visitor_hash)::int AS total FROM page_views WHERE store_id = $1',
+    [store.id],
+  );
+  visitorCount = visitorRows[0].total;
+}
+
 const hasStore = !!store;
 const host = Astro.request.headers.get('x-forwarded-host') || Astro.request.headers.get('host') || 'kataloggue.my.id';
 const siteUrl = `https://${host}`;
@@ -77,6 +87,13 @@ const siteUrl = `https://${host}`;
         >
           Kelola Produk &rarr;
         </a>
+      </div>
+
+      <!-- Visitors Card -->
+      <div class="bg-white rounded-xl shadow-md p-6">
+        <div class="text-sm text-gray-500 mb-1">Total Pengunjung</div>
+        <div class="text-3xl font-bold text-gray-900">{visitorCount}</div>
+        <p class="mt-3 text-xs text-gray-400">Pengunjung unik katalog Anda</p>
       </div>
 
       <!-- Reviews Card -->

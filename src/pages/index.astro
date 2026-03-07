@@ -1,11 +1,112 @@
 ---
+export const prerender = false;
+
 import BaseLayout from '../layouts/BaseLayout.astro';
 import SEOHead from '../components/SEOHead.astro';
 import Hero from '../components/landing/Hero.astro';
 import Features from '../components/landing/Features.astro';
+import LatestStores from '../components/landing/LatestStores.astro';
+import TopRatedStores from '../components/landing/TopRatedStores.astro';
+import PopularProducts from '../components/landing/PopularProducts.astro';
+import MostVisitedStores from '../components/landing/MostVisitedStores.astro';
 import HowItWorks from '../components/landing/HowItWorks.astro';
 import CTA from '../components/landing/CTA.astro';
 import Footer from '../components/Footer.astro';
+import { query } from '../lib/db';
+
+// Run all queries in parallel
+const [latestRes, topRatedRes, popularRes, mostVisitedRes] = await Promise.all([
+  // Latest stores with product count
+  query(`
+    SELECT s.name, s.slug, s.logo_url, s.created_at,
+           COUNT(p.id)::int AS product_count
+    FROM stores s
+    LEFT JOIN products p ON p.store_id = s.id
+    GROUP BY s.id
+    ORDER BY s.created_at DESC
+    LIMIT 8
+  `),
+
+  // Top rated stores (3+ reviews)
+  query(`
+    SELECT s.name, s.slug, s.logo_url,
+           COUNT(p.id)::int AS product_count,
+           AVG(sr.rating)::numeric(2,1) AS avg_rating,
+           COUNT(sr.id)::int AS review_count
+    FROM stores s
+    INNER JOIN store_reviews sr ON sr.store_id = s.id
+    LEFT JOIN products p ON p.store_id = s.id
+    GROUP BY s.id
+    HAVING COUNT(DISTINCT sr.id) >= 3
+    ORDER BY AVG(sr.rating) DESC, COUNT(DISTINCT sr.id) DESC
+    LIMIT 6
+  `),
+
+  // Popular products (2+ reviews)
+  query(`
+    SELECT p.name, p.slug, p.price, p.image_url, p.category,
+           s.name AS store_name, s.slug AS store_slug,
+           AVG(pr.rating)::numeric(2,1) AS avg_rating,
+           COUNT(pr.id)::int AS review_count
+    FROM products p
+    INNER JOIN product_reviews pr ON pr.product_id = p.id
+    INNER JOIN stores s ON s.id = p.store_id
+    WHERE p.is_available = true
+    GROUP BY p.id, s.name, s.slug
+    HAVING COUNT(pr.id) >= 2
+    ORDER BY COUNT(pr.id) DESC, AVG(pr.rating) DESC
+    LIMIT 8
+  `),
+
+  // Most visited stores (last 7 days)
+  query(`
+    SELECT s.name, s.slug, s.logo_url,
+           COUNT(DISTINCT p.id)::int AS product_count,
+           COUNT(DISTINCT pv.visitor_hash)::int AS visitor_count
+    FROM stores s
+    INNER JOIN page_views pv ON pv.store_id = s.id AND pv.created_at > now() - interval '7 days'
+    LEFT JOIN products p ON p.store_id = s.id
+    GROUP BY s.id
+    ORDER BY COUNT(DISTINCT pv.visitor_hash) DESC
+    LIMIT 6
+  `),
+]);
+
+const latestStores = latestRes.rows;
+const topRatedStores = topRatedRes.rows.map(r => ({ ...r, avg_rating: parseFloat(r.avg_rating) }));
+const popularProducts = popularRes.rows.map(r => ({ ...r, avg_rating: parseFloat(r.avg_rating) }));
+const mostVisitedStores = mostVisitedRes.rows;
+
+// SEO: JSON-LD WebSite schema
+const websiteJsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: 'KatalogGue',
+  url: 'https://kataloggue.my.id',
+  description: 'Buat katalog produk online gratis untuk UMKM Indonesia.',
+  potentialAction: {
+    '@type': 'SearchAction',
+    target: 'https://kataloggue.my.id/{search_term_string}',
+    'query-input': 'required name=search_term_string',
+  },
+});
+
+// SEO: ItemList for popular products
+const itemListJsonLd = popularProducts.length >= 3 ? JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  name: 'Produk Populer di KatalogGue',
+  numberOfItems: popularProducts.length,
+  itemListElement: popularProducts.map((p, i) => ({
+    '@type': 'ListItem',
+    position: i + 1,
+    url: `https://kataloggue.my.id/${p.store_slug}/${p.slug}`,
+    name: p.name,
+  })),
+}) : null;
+
+// Cache
+Astro.response.headers.set('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=600');
 ---
 
 <BaseLayout>
@@ -14,7 +115,9 @@ import Footer from '../components/Footer.astro';
       title="KatalogGue - Buat Katalog Online Gratis untuk UMKM"
       description="Buat katalog produk online gratis untuk UMKM Indonesia. Pelanggan bisa langsung order via WhatsApp. Tanpa biaya, tampil profesional, muncul di Google."
       url="https://kataloggue.my.id"
+      jsonLd={websiteJsonLd}
     />
+    {itemListJsonLd && <script type="application/ld+json" set:html={itemListJsonLd} />}
   </Fragment>
 
   <!-- Navbar -->
@@ -38,6 +141,12 @@ import Footer from '../components/Footer.astro';
 
   <Hero />
   <Features />
+
+  {latestStores.length >= 3 && <LatestStores stores={latestStores} />}
+  {topRatedStores.length >= 3 && <TopRatedStores stores={topRatedStores} />}
+  {popularProducts.length >= 3 && <PopularProducts products={popularProducts} />}
+  {mostVisitedStores.length >= 3 && <MostVisitedStores stores={mostVisitedStores} />}
+
   <HowItWorks />
   <CTA />
   <Footer />
