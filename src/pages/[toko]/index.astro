@@ -118,7 +118,9 @@ Astro.response.headers.set('Cache-Control', 'public, s-maxage=300, stale-while-r
               <ReviewForm client:load type="store" targetId={store.id} storeId={store.id} />
             </div>
 
-            <Footer showBadge={true} useCatalogStyle={true} />
+            <div class="pb-20 md:pb-0">
+              <Footer showBadge={true} useCatalogStyle={true} />
+            </div>
           </div>
         </div>
       </div>
