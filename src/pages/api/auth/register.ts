@@ -1,6 +1,7 @@
 import type { APIRoute } from 'astro';
 import { query } from '../../../lib/db';
 import { hashPassword, createToken, setAuthCookie, isValidEmail } from '../../../lib/auth';
+import { sendWelcomeEmail } from '../../../lib/email';
 
 export const prerender = false;
 
@@ -41,6 +42,9 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     const user = rows[0];
     const token = createToken(user.id, user.email);
     setAuthCookie(cookies, token);
+
+    // Send welcome email (non-blocking)
+    sendWelcomeEmail(normalizedEmail).catch(() => {});
 
     return new Response(JSON.stringify({ success: true }), { status: 201 });
   } catch {
