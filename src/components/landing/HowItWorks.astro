@@ -20,7 +20,7 @@ const steps = [
 
 <section class="py-20 bg-gray-50" id="cara-kerja">
   <div class="max-w-4xl mx-auto px-4">
-    <div class="text-center mb-16">
+    <div class="animate-on-scroll text-center mb-16">
       <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
         Cara Kerja
       </h2>
@@ -31,7 +31,7 @@ const steps = [
 
     <div class="space-y-12">
       {steps.map((step, i) => (
-        <div class="flex gap-6 items-start">
+        <div class="animate-on-scroll slide-left flex gap-6 items-start" data-delay={i + 1}>
           <div class="flex-shrink-0 w-12 h-12 bg-primary text-white rounded-full flex items-center justify-center text-xl font-bold">
             {step.number}
           </div>

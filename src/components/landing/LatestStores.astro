@@ -24,14 +24,14 @@ function timeAgo(dateStr: string): string {
 
 <section class="bg-gray-50 py-16 md:py-20">
   <div class="max-w-6xl mx-auto px-4">
-    <div class="text-center mb-10">
+    <div class="animate-on-scroll text-center mb-10">
       <h2 class="text-2xl md:text-3xl font-bold text-gray-900">Toko Terbaru di KatalogGue</h2>
       <p class="mt-2 text-gray-600">UMKM dari seluruh Indonesia sudah bergabung. Kapan giliran Anda?</p>
     </div>
 
     <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-      {stores.map(store => (
-        <a href={`/${store.slug}`} class="bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow group">
+      {stores.map((store, i) => (
+        <a href={`/${store.slug}`} class="animate-on-scroll bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow group" data-delay={i + 1}>
           <div class="flex items-center gap-3 mb-3">
             {store.logo_url ? (
               <img

@@ -14,3 +14,53 @@
   --color-wa-green: #25d366;
   --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
 }
+
+/* Scroll animation keyframes */
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slide-from-left {
+  from { opacity: 0; transform: translateX(-24px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+/* Scroll-triggered: invisible until observed */
+.animate-on-scroll {
+  opacity: 0;
+}
+
+.animate-on-scroll.in-view {
+  animation: fade-up 0.6s ease-out forwards;
+}
+
+.animate-on-scroll.slide-left.in-view {
+  animation: slide-from-left 0.6s ease-out forwards;
+}
+
+/* Hero: plays on page load (CSS only, no observer) */
+.hero-animate {
+  opacity: 0;
+  animation: fade-up 0.6s ease-out forwards;
+}
+
+/* Stagger delays */
+[data-delay="1"] { animation-delay: 100ms; }
+[data-delay="2"] { animation-delay: 200ms; }
+[data-delay="3"] { animation-delay: 300ms; }
+[data-delay="4"] { animation-delay: 400ms; }
+[data-delay="5"] { animation-delay: 500ms; }
+[data-delay="6"] { animation-delay: 600ms; }
+[data-delay="7"] { animation-delay: 700ms; }
+[data-delay="8"] { animation-delay: 800ms; }
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .animate-on-scroll,
+  .hero-animate {
+    opacity: 1 !important;
+    animation: none !important;
+    transform: none !important;
+  }
+}

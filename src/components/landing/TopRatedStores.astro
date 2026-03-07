@@ -17,14 +17,14 @@ const { stores } = Astro.props;
 
 <section class="bg-white py-16 md:py-20">
   <div class="max-w-6xl mx-auto px-4">
-    <div class="text-center mb-10">
+    <div class="animate-on-scroll text-center mb-10">
       <h2 class="text-2xl md:text-3xl font-bold text-gray-900">Toko Terbaik Pilihan Pembeli</h2>
       <p class="mt-2 text-gray-600">Rating tertinggi dari ulasan pelanggan nyata.</p>
     </div>
 
     <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-      {stores.map(store => (
-        <a href={`/${store.slug}`} class="flex items-center gap-4 bg-gray-50 rounded-xl p-4 hover:shadow-md transition-shadow group">
+      {stores.map((store, i) => (
+        <a href={`/${store.slug}`} class="animate-on-scroll flex items-center gap-4 bg-gray-50 rounded-xl p-4 hover:shadow-md transition-shadow group" data-delay={i + 1}>
           {store.logo_url ? (
             <img
               src={imageUrl(store.logo_url)}

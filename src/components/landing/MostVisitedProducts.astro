@@ -19,14 +19,14 @@ const { products } = Astro.props;
 
 <section class="py-16 md:py-20">
   <div class="max-w-6xl mx-auto px-4">
-    <div class="text-center mb-10">
+    <div class="animate-on-scroll text-center mb-10">
       <h2 class="text-2xl md:text-3xl font-bold text-gray-900">Produk Paling Dikunjungi</h2>
       <p class="mt-2 text-gray-600">Produk yang paling banyak dilihat minggu ini.</p>
     </div>
 
     <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-      {products.map(product => (
-        <a href={`/${product.store_slug}/${product.slug}`} class="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow group">
+      {products.map((product, i) => (
+        <a href={`/${product.store_slug}/${product.slug}`} class="animate-on-scroll bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow group" data-delay={i + 1}>
           <div class="aspect-square bg-gray-100 overflow-hidden relative">
             {product.image_url ? (
               <img
