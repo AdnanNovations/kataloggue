@@ -9,13 +9,14 @@ import LatestStores from '../components/landing/LatestStores.astro';
 import TopRatedStores from '../components/landing/TopRatedStores.astro';
 import PopularProducts from '../components/landing/PopularProducts.astro';
 import MostVisitedStores from '../components/landing/MostVisitedStores.astro';
+import MostVisitedProducts from '../components/landing/MostVisitedProducts.astro';
 import HowItWorks from '../components/landing/HowItWorks.astro';
 import CTA from '../components/landing/CTA.astro';
 import Footer from '../components/Footer.astro';
 import { query } from '../lib/db';
 
 // Run all queries in parallel
-const [latestRes, topRatedRes, popularRes, mostVisitedRes] = await Promise.all([
+const [latestRes, topRatedRes, popularRes, mostVisitedRes, mostVisitedProductsRes] = await Promise.all([
   // Latest stores with product count
   query(`
     SELECT s.name, s.slug, s.logo_url, s.created_at,
@@ -37,7 +38,7 @@ const [latestRes, topRatedRes, popularRes, mostVisitedRes] = await Promise.all([
     INNER JOIN store_reviews sr ON sr.store_id = s.id
     LEFT JOIN products p ON p.store_id = s.id
     GROUP BY s.id
-    HAVING COUNT(DISTINCT sr.id) >= 3
+    HAVING COUNT(DISTINCT sr.id) >= 1
     ORDER BY AVG(sr.rating) DESC, COUNT(DISTINCT sr.id) DESC
     LIMIT 6
   `),
@@ -53,7 +54,7 @@ const [latestRes, topRatedRes, popularRes, mostVisitedRes] = await Promise.all([
     INNER JOIN stores s ON s.id = p.store_id
     WHERE p.is_available = true
     GROUP BY p.id, s.name, s.slug
-    HAVING COUNT(pr.id) >= 2
+    HAVING COUNT(pr.id) >= 1
     ORDER BY COUNT(pr.id) DESC, AVG(pr.rating) DESC
     LIMIT 8
   `),
@@ -70,12 +71,27 @@ const [latestRes, topRatedRes, popularRes, mostVisitedRes] = await Promise.all([
     ORDER BY COUNT(DISTINCT pv.visitor_hash) DESC
     LIMIT 6
   `),
+
+  // Most visited products (last 7 days)
+  query(`
+    SELECT p.name, p.slug, p.price, p.image_url, p.category,
+           s.name AS store_name, s.slug AS store_slug,
+           COUNT(DISTINCT pv.visitor_hash)::int AS visitor_count
+    FROM products p
+    INNER JOIN page_views pv ON pv.product_id = p.id AND pv.created_at > now() - interval '7 days'
+    INNER JOIN stores s ON s.id = p.store_id
+    WHERE p.is_available = true
+    GROUP BY p.id, s.name, s.slug
+    ORDER BY COUNT(DISTINCT pv.visitor_hash) DESC
+    LIMIT 8
+  `),
 ]);
 
 const latestStores = latestRes.rows;
 const topRatedStores = topRatedRes.rows.map(r => ({ ...r, avg_rating: parseFloat(r.avg_rating) }));
 const popularProducts = popularRes.rows.map(r => ({ ...r, avg_rating: parseFloat(r.avg_rating) }));
 const mostVisitedStores = mostVisitedRes.rows;
+const mostVisitedProducts = mostVisitedProductsRes.rows;
 
 // SEO: JSON-LD WebSite schema
 const websiteJsonLd = JSON.stringify({
@@ -92,7 +108,7 @@ const websiteJsonLd = JSON.stringify({
 });
 
 // SEO: ItemList for popular products
-const itemListJsonLd = popularProducts.length >= 3 ? JSON.stringify({
+const itemListJsonLd = popularProducts.length >= 1 ? JSON.stringify({
   '@context': 'https://schema.org',
   '@type': 'ItemList',
   name: 'Produk Populer di KatalogGue',
@@ -142,10 +158,11 @@ Astro.response.headers.set('Cache-Control', 'public, s-maxage=300, stale-while-r
   <Hero />
   <Features />
 
-  {latestStores.length >= 3 && <LatestStores stores={latestStores} />}
-  {topRatedStores.length >= 3 && <TopRatedStores stores={topRatedStores} />}
-  {popularProducts.length >= 3 && <PopularProducts products={popularProducts} />}
-  {mostVisitedStores.length >= 3 && <MostVisitedStores stores={mostVisitedStores} />}
+  {latestStores.length >= 1 && <LatestStores stores={latestStores} />}
+  {topRatedStores.length >= 1 && <TopRatedStores stores={topRatedStores} />}
+  {popularProducts.length >= 1 && <PopularProducts products={popularProducts} />}
+  {mostVisitedProducts.length >= 1 && <MostVisitedProducts products={mostVisitedProducts} />}
+  {mostVisitedStores.length >= 1 && <MostVisitedStores stores={mostVisitedStores} />}
 
   <HowItWorks />
   <CTA />
