@@ -1,5 +1,5 @@
 import type { Store, Product } from './db';
-import { formatPrice, imageUrl } from './utils';
+import { formatPrice, imageUrl, parseProductImages } from './utils';
 
 const SITE_URL = 'https://kataloggue.my.id';
 const SITE_NAME = 'KatalogGue';
@@ -34,12 +34,14 @@ export function storeJsonLd(store: Store) {
 
 /** JSON-LD for a product (Product schema) */
 export function productJsonLd(product: Product, store: Store) {
+  const images = parseProductImages(product);
+  const imageList = images.length > 0 ? images.map(i => imageUrl(i)) : [imageUrl(product.image_url)];
   return JSON.stringify({
     '@context': 'https://schema.org',
     '@type': 'Product',
     name: product.name,
     description: product.description || product.name,
-    image: imageUrl(product.image_url),
+    image: imageList.length === 1 ? imageList[0] : imageList,
     url: productUrl(store.slug, product.slug),
     offers: {
       '@type': 'Offer',

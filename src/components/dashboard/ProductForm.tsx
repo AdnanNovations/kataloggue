@@ -1,5 +1,7 @@
 import { useState } from 'react';
-import ImageUpload from './ImageUpload';
+import MultiImageUpload from './MultiImageUpload';
+import VariantEditor from './VariantEditor';
+import type { VariantGroup } from '../../lib/db';
 
 interface Product {
   id?: string;
@@ -8,6 +10,8 @@ interface Product {
   description: string;
   price: number;
   image_url: string;
+  images: string[];
+  variants: VariantGroup[];
   category: string;
   is_available: boolean;
 }
@@ -26,6 +30,8 @@ export default function ProductForm({ product, onSaved, onCancel }: Props) {
     description: product?.description || '',
     price: product?.price || 0,
     image_url: product?.image_url || '',
+    images: product?.images || [],
+    variants: product?.variants || [],
     category: product?.category || '',
     is_available: product?.is_available ?? true,
   });
@@ -48,10 +54,14 @@ export default function ProductForm({ product, onSaved, onCancel }: Props) {
     setError('');
 
     try {
+      const payload = {
+        ...form,
+        image_url: form.images.length > 0 ? form.images[0] : form.image_url,
+      };
       const res = await fetch('/api/produk', {
         method: product?.id ? 'PUT' : 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
+        body: JSON.stringify(payload),
       });
       const data = await res.json();
       if (data.error) {
@@ -76,9 +86,9 @@ export default function ProductForm({ product, onSaved, onCancel }: Props) {
         <div className="p-3 bg-red-50 text-red-700 rounded-lg text-sm">{error}</div>
       )}
 
-      <ImageUpload
-        currentUrl={form.image_url}
-        onUploaded={(url) => setForm(prev => ({ ...prev, image_url: url }))}
+      <MultiImageUpload
+        images={form.images}
+        onChange={(images) => setForm(prev => ({ ...prev, images }))}
       />
 
       <div className="space-y-1">
@@ -127,6 +137,11 @@ export default function ProductForm({ product, onSaved, onCancel }: Props) {
           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-600 focus:border-transparent outline-none"
         />
       </div>
+
+      <VariantEditor
+        variants={form.variants}
+        onChange={(variants) => setForm(prev => ({ ...prev, variants }))}
+      />
 
       <label className="flex items-center gap-2">
         <input

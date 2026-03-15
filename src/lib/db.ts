@@ -29,6 +29,16 @@ export interface Store {
   created_at: string;
 }
 
+export interface VariantOption {
+  name: string;
+  priceAdjust: number;
+}
+
+export interface VariantGroup {
+  label: string;
+  options: VariantOption[];
+}
+
 export interface Product {
   id: string;
   store_id: string;
@@ -37,6 +47,8 @@ export interface Product {
   description: string | null;
   price: number;
   image_url: string | null;
+  images: string | null;
+  variants: string | null;
   category: string | null;
   is_available: boolean;
   sort_order: number;

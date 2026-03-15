@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import ProductForm from './ProductForm';
 import StarRating from '../reviews/StarRating';
+import { parseProductImages, parseProductVariants } from '../../lib/utils';
 
 interface Product {
   id: string;
@@ -9,6 +10,8 @@ interface Product {
   description: string | null;
   price: number;
   image_url: string | null;
+  images: string | null;
+  variants: string | null;
   category: string | null;
   is_available: boolean;
   avg_rating?: number;
@@ -70,6 +73,8 @@ export default function ProductList({ initialProducts, storeSlug }: Props) {
             description: editing.description || '',
             price: editing.price,
             image_url: editing.image_url || '',
+            images: parseProductImages(editing),
+            variants: parseProductVariants(editing.variants),
             category: editing.category || '',
             is_available: editing.is_available,
           } : undefined}
@@ -114,8 +119,8 @@ export default function ProductList({ initialProducts, storeSlug }: Props) {
         <div className="grid gap-4">
           {products.map(product => (
             <div key={product.id} className="bg-white rounded-xl shadow-md p-4 flex gap-4 items-center">
-              {product.image_url ? (
-                <img src={product.image_url} alt={product.name} className="w-20 h-20 object-cover rounded-lg flex-shrink-0" />
+              {parseProductImages(product)[0] ? (
+                <img src={parseProductImages(product)[0]} alt={product.name} className="w-20 h-20 object-cover rounded-lg flex-shrink-0" />
               ) : (
                 <div className="w-20 h-20 bg-gray-100 rounded-lg flex items-center justify-center text-gray-400 flex-shrink-0">
                   <span className="text-2xl">&#128247;</span>

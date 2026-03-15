@@ -32,6 +32,8 @@ CREATE TABLE products (
   description TEXT,
   price BIGINT NOT NULL,
   image_url TEXT,
+  images TEXT,
+  variants TEXT,
   category TEXT,
   is_available BOOLEAN DEFAULT true,
   sort_order INT DEFAULT 0,

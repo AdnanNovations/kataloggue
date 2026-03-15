@@ -18,18 +18,49 @@ export function slugify(text: string): string {
     .trim();
 }
 
+export interface VariantSelection {
+  label: string;
+  option: string;
+}
+
 /** Build WhatsApp URL with pre-filled message */
-export function waOrderUrl(phone: string, storeName: string, productName?: string, price?: number): string {
+export function waOrderUrl(phone: string, storeName: string, productName?: string, price?: number, variants?: VariantSelection[]): string {
   const cleanPhone = phone.replace(/\D/g, '').replace(/^0/, '62');
   let message = `Halo ${storeName}, saya tertarik `;
   if (productName) {
     message += `dengan produk *${productName}*`;
     if (price) message += ` (${formatPrice(price)})`;
-    message += '. Apakah masih tersedia?';
+    message += '.';
+    if (variants && variants.length > 0) {
+      message += '\nVarian: ' + variants.map(v => `${v.label}: ${v.option}`).join(', ');
+    }
+    message += '\nApakah masih tersedia?';
   } else {
     message += 'dengan produk di katalog Anda.';
   }
   return `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;
+}
+
+/** Parse product images JSON, falling back to image_url */
+export function parseProductImages(product: { images?: string | null; image_url?: string | null }): string[] {
+  if (product.images) {
+    try {
+      const parsed = JSON.parse(product.images);
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+    } catch {}
+  }
+  if (product.image_url) return [product.image_url];
+  return [];
+}
+
+/** Parse product variants JSON */
+export function parseProductVariants(variants: string | null | undefined): import('./db').VariantGroup[] {
+  if (!variants) return [];
+  try {
+    const parsed = JSON.parse(variants);
+    if (Array.isArray(parsed)) return parsed;
+  } catch {}
+  return [];
 }
 
 /** Get image URL - local path or placeholder */
