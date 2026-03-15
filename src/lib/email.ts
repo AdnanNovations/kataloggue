@@ -24,8 +24,7 @@ function emailLayout(content: string): string {
 
 <!-- Header -->
 <tr><td style="background-color:#16a34a;padding:24px 32px;text-align:center;">
-  <img src="${SITE_URL}/logo-kataloggue.webp" alt="KatalogGue" width="36" height="36" style="border-radius:8px;margin-bottom:8px;display:inline-block;">
-  <div style="color:#ffffff;font-size:20px;font-weight:700;letter-spacing:-0.3px;">KatalogGue</div>
+  <img src="${SITE_URL}/logo-kataloggue.webp" alt="KatalogGue" height="40" style="height:40px;width:auto;display:inline-block;">
 </td></tr>
 
 <!-- Body -->
