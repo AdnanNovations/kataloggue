@@ -24,6 +24,16 @@ export default function RichTextEditor({ value, onChange }: Props) {
       }),
     ],
     content: value,
+    editorProps: {
+      transformPastedHTML(html) {
+        // Remove empty paragraphs: <p><br></p>, <p>&nbsp;</p>, <p></p>
+        let cleaned = html.replace(/<p>\s*(?:<br\s*\/?>|&nbsp;)?\s*<\/p>/gi, '');
+        // Remove stray <br> between block elements
+        cleaned = cleaned.replace(/(<\/(?:h[1-6]|ul|ol|li|table|tr|td|th|blockquote|hr|pre|div)>)\s*(?:<br\s*\/?\s*>)+/gi, '$1');
+        cleaned = cleaned.replace(/(?:<br\s*\/?\s*>)+\s*(<(?:h[1-6]|ul|ol|li|table|tr|td|th|blockquote|hr|pre|div)[\s>])/gi, '$1');
+        return cleaned;
+      },
+    },
     onUpdate: ({ editor }) => {
       onChange(editor.getHTML());
     },
