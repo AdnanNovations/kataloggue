@@ -56,6 +56,12 @@ export const POST: APIRoute = async ({ locals, request }) => {
       footerBg: validateColor(body.footerBg, d.footerBg),
       footerText: validateColor(body.footerText, d.footerText),
       footerBorder: validateColor(body.footerBorder, d.footerBorder),
+
+      reviewBg: validateColor(body.reviewBg, d.reviewBg),
+      reviewBorder: validateColor(body.reviewBorder, d.reviewBorder),
+      reviewText: validateColor(body.reviewText, d.reviewText),
+      reviewSubtext: validateColor(body.reviewSubtext, d.reviewSubtext),
+      reviewInputBg: validateColor(body.reviewInputBg, d.reviewInputBg),
     };
 
     await query(
