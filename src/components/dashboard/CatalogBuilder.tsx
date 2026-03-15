@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import type { CatalogStyle } from '../../lib/catalog-style';
 import { DEFAULT_CATALOG_STYLE, CATALOG_PRESETS } from '../../lib/catalog-style';
 import ColorInput from './ColorInput';
 import ButtonGroup from './ButtonGroup';
 import CatalogPreview from './CatalogPreview';
+
+const MAX_BG_SIZE = 600 * 1024; // 600KB
 
 interface CatalogBuilderProps {
   initialStyle: CatalogStyle;
@@ -18,9 +20,51 @@ export default function CatalogBuilder({ initialStyle, storeName, storeSlug }: C
   const [openSections, setOpenSections] = useState<Set<Section>>(new Set(['background']));
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [bgUploading, setBgUploading] = useState(false);
+  const [bgError, setBgError] = useState('');
+  const [bgInputMode, setBgInputMode] = useState<'upload' | 'url'>(
+    initialStyle.pageBgImage && initialStyle.pageBgImage.startsWith('http') ? 'url' : 'upload',
+  );
+  const [dragging, setDragging] = useState(false);
+  const bgInputRef = useRef<HTMLInputElement>(null);
 
   const update = (partial: Partial<CatalogStyle>) => {
     setStyle((prev) => ({ ...prev, ...partial }));
+  };
+
+  const handleBgUpload = async (file: File) => {
+    setBgError('');
+    if (!file.type.match(/^image\/(jpeg|png|webp)$/)) {
+      setBgError('Format tidak didukung. Gunakan JPG, PNG, atau WebP.');
+      return;
+    }
+    if (file.size > MAX_BG_SIZE) {
+      setBgError(`Ukuran file ${(file.size / 1024).toFixed(0)}KB melebihi batas 600KB.`);
+      return;
+    }
+    setBgUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      const res = await fetch('/api/upload', { method: 'POST', body: formData });
+      const data = await res.json();
+      if (!res.ok) {
+        setBgError(data.error || 'Gagal upload gambar');
+        return;
+      }
+      update({ pageBgImage: data.url });
+    } catch {
+      setBgError('Gagal upload gambar. Coba lagi.');
+    } finally {
+      setBgUploading(false);
+    }
+  };
+
+  const handleBgDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setDragging(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file) handleBgUpload(file);
   };
 
   const toggleSection = (section: Section) => {
@@ -111,16 +155,145 @@ export default function CatalogBuilder({ initialStyle, storeName, storeSlug }: C
           {openSections.has('background') && (
             <div className="py-3 space-y-3">
               <ColorInput label="Warna Background" value={style.pageBg} onChange={(v) => update({ pageBg: v })} />
+
+              {/* Background Image */}
               <div>
-                <label className="text-xs text-gray-500 block mb-1">URL Gambar Background</label>
-                <input
-                  type="text"
-                  value={style.pageBgImage}
-                  onChange={(e) => update({ pageBgImage: e.target.value })}
-                  placeholder="https://..."
-                  className="w-full text-sm border border-gray-200 rounded-lg px-3 py-1.5"
-                />
+                <label className="text-xs text-gray-500 block mb-2">Gambar Background</label>
+
+                {/* Mode toggle */}
+                <div className="flex gap-1 mb-2 p-0.5 bg-gray-100 rounded-lg">
+                  <button
+                    type="button"
+                    onClick={() => setBgInputMode('upload')}
+                    className={`flex-1 text-xs py-1.5 rounded-md font-medium transition-colors ${
+                      bgInputMode === 'upload'
+                        ? 'bg-white text-gray-800 shadow-sm'
+                        : 'text-gray-500 hover:text-gray-700'
+                    }`}
+                  >
+                    Upload Gambar
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setBgInputMode('url')}
+                    className={`flex-1 text-xs py-1.5 rounded-md font-medium transition-colors ${
+                      bgInputMode === 'url'
+                        ? 'bg-white text-gray-800 shadow-sm'
+                        : 'text-gray-500 hover:text-gray-700'
+                    }`}
+                  >
+                    URL Gambar
+                  </button>
+                </div>
+
+                {bgInputMode === 'upload' ? (
+                  <div>
+                    {/* Preview with remove */}
+                    {style.pageBgImage && !style.pageBgImage.startsWith('http') && (
+                      <div className="relative mb-2 rounded-lg overflow-hidden border border-gray-200">
+                        <img
+                          src={style.pageBgImage}
+                          alt="Background preview"
+                          className="w-full h-28 object-cover"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => update({ pageBgImage: '', pageBgOverlay: 0 })}
+                          className="absolute top-1.5 right-1.5 w-6 h-6 flex items-center justify-center rounded-full bg-black/60 text-white hover:bg-black/80 transition-colors"
+                          title="Hapus gambar"
+                        >
+                          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                        </button>
+                      </div>
+                    )}
+
+                    {/* Drop zone */}
+                    <div
+                      onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
+                      onDragLeave={() => setDragging(false)}
+                      onDrop={handleBgDrop}
+                      onClick={() => bgInputRef.current?.click()}
+                      className={`relative border-2 border-dashed rounded-lg p-4 text-center cursor-pointer transition-colors ${
+                        dragging
+                          ? 'border-green-400 bg-green-50'
+                          : 'border-gray-300 hover:border-gray-400'
+                      }`}
+                    >
+                      {bgUploading ? (
+                        <div className="flex items-center justify-center gap-2 py-2">
+                          <svg className="w-5 h-5 animate-spin text-green-600" viewBox="0 0 24 24" fill="none">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                          </svg>
+                          <span className="text-sm text-gray-600">Mengupload...</span>
+                        </div>
+                      ) : (
+                        <div>
+                          <svg className="w-8 h-8 mx-auto text-gray-400 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                          </svg>
+                          <p className="text-xs text-gray-500">Klik atau seret gambar ke sini</p>
+                          <p className="text-[10px] text-gray-400 mt-0.5">JPG, PNG, WebP (maks 600KB)</p>
+                        </div>
+                      )}
+                    </div>
+                    <input
+                      ref={bgInputRef}
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp"
+                      className="hidden"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) handleBgUpload(file);
+                        e.target.value = '';
+                      }}
+                    />
+                  </div>
+                ) : (
+                  <div>
+                    {/* URL preview */}
+                    {style.pageBgImage && style.pageBgImage.startsWith('http') && (
+                      <div className="relative mb-2 rounded-lg overflow-hidden border border-gray-200">
+                        <img
+                          src={style.pageBgImage}
+                          alt="Background preview"
+                          className="w-full h-28 object-cover"
+                          onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => update({ pageBgImage: '', pageBgOverlay: 0 })}
+                          className="absolute top-1.5 right-1.5 w-6 h-6 flex items-center justify-center rounded-full bg-black/60 text-white hover:bg-black/80 transition-colors"
+                          title="Hapus gambar"
+                        >
+                          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                        </button>
+                      </div>
+                    )}
+                    <input
+                      type="text"
+                      value={style.pageBgImage}
+                      onChange={(e) => update({ pageBgImage: e.target.value })}
+                      placeholder="https://example.com/gambar.jpg"
+                      className="w-full text-sm border border-gray-200 rounded-lg px-3 py-1.5"
+                    />
+                  </div>
+                )}
+
+                {bgError && (
+                  <p className="mt-1.5 text-xs text-red-600 flex items-center gap-1">
+                    <svg className="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    {bgError}
+                  </p>
+                )}
               </div>
+
               {style.pageBgImage && (
                 <div>
                   <label className="text-xs text-gray-500 block mb-1">
