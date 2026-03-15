@@ -13,7 +13,7 @@ interface CatalogBuilderProps {
   storeSlug: string;
 }
 
-type Section = 'background' | 'header' | 'accent' | 'card' | 'pill' | 'review' | 'footer';
+type Section = 'background' | 'header' | 'accent' | 'card' | 'pill' | 'detail' | 'review' | 'footer';
 
 export default function CatalogBuilder({ initialStyle, storeName, storeSlug }: CatalogBuilderProps) {
   const [style, setStyle] = useState<CatalogStyle>(initialStyle);
@@ -376,6 +376,18 @@ export default function CatalogBuilder({ initialStyle, storeName, storeSlug }: C
               <ColorInput label="Pil Aktif - Teks" value={style.pillActiveText} onChange={(v) => update({ pillActiveText: v })} />
               <ColorInput label="Pil Biasa - Background" value={style.pillBg} onChange={(v) => update({ pillBg: v })} />
               <ColorInput label="Pil Biasa - Teks" value={style.pillText} onChange={(v) => update({ pillText: v })} />
+            </div>
+          )}
+
+          {/* Product Detail */}
+          <SectionHeader id="detail" title="Halaman Produk" />
+          {openSections.has('detail') && (
+            <div className="py-3 space-y-3">
+              <ColorInput label="Background Info" value={style.detailBg} onChange={(v) => update({ detailBg: v })} />
+              <ColorInput label="Teks Deskripsi" value={style.detailText} onChange={(v) => update({ detailText: v })} />
+              <ColorInput label="Teks Label" value={style.detailSubtext} onChange={(v) => update({ detailSubtext: v })} />
+              <ColorInput label="Background Label" value={style.detailLabelBg} onChange={(v) => update({ detailLabelBg: v })} />
+              <ColorInput label="Border" value={style.detailBorder} onChange={(v) => update({ detailBorder: v })} />
             </div>
           )}
 

@@ -36,6 +36,12 @@ export interface CatalogStyle {
   reviewText: string;
   reviewSubtext: string;
   reviewInputBg: string;
+
+  detailBg: string;
+  detailText: string;
+  detailSubtext: string;
+  detailLabelBg: string;
+  detailBorder: string;
 }
 
 export const DEFAULT_CATALOG_STYLE: CatalogStyle = {
@@ -74,6 +80,12 @@ export const DEFAULT_CATALOG_STYLE: CatalogStyle = {
   reviewText: '#111827',
   reviewSubtext: '#6b7280',
   reviewInputBg: '#ffffff',
+
+  detailBg: '#ffffff',
+  detailText: '#374151',
+  detailSubtext: '#9ca3af',
+  detailLabelBg: '#f3f4f6',
+  detailBorder: '#e5e7eb',
 };
 
 export interface CatalogPreset {
@@ -139,6 +151,11 @@ export const CATALOG_PRESETS: CatalogPreset[] = [
       reviewText: '#f9fafb',
       reviewSubtext: '#9ca3af',
       reviewInputBg: '#374151',
+      detailBg: '#1f2937',
+      detailText: '#d1d5db',
+      detailSubtext: '#9ca3af',
+      detailLabelBg: '#374151',
+      detailBorder: '#374151',
     },
   },
   {
@@ -312,6 +329,11 @@ export function catalogStyleVars(style: CatalogStyle): string {
     `--cs-review-text:${style.reviewText}`,
     `--cs-review-subtext:${style.reviewSubtext}`,
     `--cs-review-input-bg:${style.reviewInputBg}`,
+    `--cs-detail-bg:${style.detailBg}`,
+    `--cs-detail-text:${style.detailText}`,
+    `--cs-detail-subtext:${style.detailSubtext}`,
+    `--cs-detail-label-bg:${style.detailLabelBg}`,
+    `--cs-detail-border:${style.detailBorder}`,
   ];
   return vars.join(';');
 }
