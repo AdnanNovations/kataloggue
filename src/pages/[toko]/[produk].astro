@@ -124,13 +124,6 @@ Astro.response.headers.set('Cache-Control', 'public, s-maxage=60, stale-while-re
             isAvailable={product.is_available}
           />
 
-          {safeDescription && (
-            <div class="mt-4 sm:mt-6">
-              <h2 class="font-semibold mb-1 sm:mb-2 text-sm sm:text-base" style="color:var(--cs-product-name)">Deskripsi</h2>
-              <ExpandableDescription client:load safeHtml={safeDescription} />
-            </div>
-          )}
-
           <!-- Share buttons -->
           <div class="mt-3 sm:mt-4 flex flex-wrap items-center gap-2 sm:gap-3 pt-3 sm:pt-4" style="border-top:1px solid var(--cs-detail-border)">
             <span class="text-xs sm:text-sm" style="color:var(--cs-detail-subtext)">Bagikan:</span>
@@ -155,6 +148,14 @@ Astro.response.headers.set('Cache-Control', 'public, s-maxage=60, stale-while-re
         </div>
       </div>
     </div>
+
+    <!-- Product Description -->
+    {safeDescription && (
+      <div class="mt-6 sm:mt-8 rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8" style="background-color:var(--cs-detail-bg);border:1px solid var(--cs-detail-border)">
+        <h2 class="text-base sm:text-lg font-semibold mb-3 sm:mb-4" style="color:var(--cs-product-name)">Deskripsi Produk</h2>
+        <ExpandableDescription client:load safeHtml={safeDescription} />
+      </div>
+    )}
 
     <!-- Review Form -->
     <div class="mt-8 sm:mt-12">

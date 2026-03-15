@@ -29,9 +29,26 @@ export function stripHtml(html: string): string {
   }).trim();
 }
 
-/** Detect legacy plain-text (no HTML tags) and convert \n to <br> */
+/** Decode HTML entities (handles double-encoded content from Tiptap) */
+function decodeEntities(html: string): string {
+  return html
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#039;/g, "'")
+    .replace(/&mdash;/g, '\u2014')
+    .replace(/&ndash;/g, '\u2013');
+}
+
+/** Detect legacy plain-text (no HTML tags) and convert \n to <br>.
+ *  Also fixes double-encoded HTML (e.g. Tiptap wrapping raw HTML as text). */
 export function normalizeDescription(text: string): string {
   if (!text) return '';
+  // If content has real tags but also contains encoded tags inside, decode them
+  if (/<[a-z][\s\S]*>/i.test(text) && /&lt;[a-z]/i.test(text)) {
+    return decodeEntities(text);
+  }
   // If text contains any HTML tags, return as-is
   if (/<[a-z][\s\S]*>/i.test(text)) return text;
   // Plain text — convert newlines to <br>
