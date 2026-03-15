@@ -93,7 +93,7 @@ export default function RichTextEditor({ value, onChange }: Props) {
       {/* Editor */}
       <EditorContent
         editor={editor}
-        className="prose prose-sm max-w-none p-3 min-h-[120px] focus:outline-none [&_.tiptap]:outline-none [&_.tiptap]:min-h-[96px]"
+        className="prose prose-sm max-w-none p-3 min-h-[120px] max-h-[400px] overflow-y-auto focus:outline-none [&_.tiptap]:outline-none [&_.tiptap]:min-h-[96px]"
       />
     </div>
   );
