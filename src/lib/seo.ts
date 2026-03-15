@@ -1,5 +1,6 @@
 import type { Store, Product } from './db';
 import { formatPrice, imageUrl, parseProductImages } from './utils';
+import { stripHtml } from './sanitize';
 
 const SITE_URL = 'https://kataloggue.my.id';
 const SITE_NAME = 'KatalogGue';
@@ -40,7 +41,7 @@ export function productJsonLd(product: Product, store: Store) {
     '@context': 'https://schema.org',
     '@type': 'Product',
     name: product.name,
-    description: product.description || product.name,
+    description: (product.description ? stripHtml(product.description) : '') || product.name,
     image: imageList.length === 1 ? imageList[0] : imageList,
     url: productUrl(store.slug, product.slug),
     offers: {

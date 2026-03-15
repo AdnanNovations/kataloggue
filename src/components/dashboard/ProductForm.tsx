@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import MultiImageUpload from './MultiImageUpload';
 import VariantEditor from './VariantEditor';
+import RichTextEditor from './RichTextEditor';
 import type { VariantGroup } from '../../lib/db';
 
 interface Product {
@@ -106,12 +107,15 @@ export default function ProductForm({ product, onSaved, onCancel }: Props) {
       <div className="space-y-1">
         <label className="block text-sm font-medium text-gray-700">Harga (Rp) *</label>
         <input
-          type="number"
+          type="text"
+          inputMode="numeric"
           required
-          min="0"
-          value={form.price || ''}
-          onChange={e => setForm(prev => ({ ...prev, price: parseInt(e.target.value) || 0 }))}
-          placeholder="50000"
+          value={form.price ? form.price.toLocaleString('id-ID') : ''}
+          onChange={e => {
+            const raw = e.target.value.replace(/\D/g, '');
+            setForm(prev => ({ ...prev, price: parseInt(raw) || 0 }));
+          }}
+          placeholder="500.000"
           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-600 focus:border-transparent outline-none"
         />
       </div>
@@ -129,12 +133,9 @@ export default function ProductForm({ product, onSaved, onCancel }: Props) {
 
       <div className="space-y-1">
         <label className="block text-sm font-medium text-gray-700">Deskripsi</label>
-        <textarea
+        <RichTextEditor
           value={form.description}
-          onChange={e => setForm(prev => ({ ...prev, description: e.target.value }))}
-          rows={3}
-          placeholder="Jelaskan produk Anda..."
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-600 focus:border-transparent outline-none"
+          onChange={(html) => setForm(prev => ({ ...prev, description: html }))}
         />
       </div>
 

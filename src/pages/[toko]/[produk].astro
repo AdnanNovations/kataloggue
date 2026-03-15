@@ -8,10 +8,12 @@ import ReviewDialog from '../../components/reviews/ReviewDialog';
 import ReviewForm from '../../components/reviews/ReviewForm';
 import ImageGallery from '../../components/catalog/ImageGallery';
 import VariantSelector from '../../components/catalog/VariantSelector';
+import ExpandableDescription from '../../components/catalog/ExpandableDescription';
 import { query } from '../../lib/db';
 import { formatPrice, imageUrl, parseProductImages, parseProductVariants } from '../../lib/utils';
 import { productJsonLd, productUrl } from '../../lib/seo';
 import { resolveCatalogStyle, catalogStyleVars } from '../../lib/catalog-style';
+import { sanitizeDescription, normalizeDescription, stripHtml } from '../../lib/sanitize';
 
 const { toko, produk } = Astro.params;
 
@@ -50,6 +52,12 @@ const host = Astro.request.headers.get('x-forwarded-host') || Astro.request.head
 const siteUrl = `https://${host}`;
 const fullProductUrl = `${siteUrl}/${store.slug}/${product.slug}`;
 
+// Sanitize description
+const safeDescription = product.description
+  ? sanitizeDescription(normalizeDescription(product.description))
+  : '';
+const plainDescription = product.description ? stripHtml(product.description) : '';
+
 // Cache
 Astro.response.headers.set('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=120');
 ---
@@ -58,7 +66,7 @@ Astro.response.headers.set('Cache-Control', 'public, s-maxage=60, stale-while-re
   <Fragment slot="head">
     <SEOHead
       title={`${product.name} - ${store.name}`}
-      description={product.description || `${product.name} - ${formatPrice(product.price)}. Order via WhatsApp di ${store.name}.`}
+      description={plainDescription || `${product.name} - ${formatPrice(product.price)}. Order via WhatsApp di ${store.name}.`}
       url={productUrl(store.slug, product.slug)}
       image={product.image_url || store.logo_url || undefined}
       jsonLd={productJsonLd(product, store)}
@@ -116,10 +124,10 @@ Astro.response.headers.set('Cache-Control', 'public, s-maxage=60, stale-while-re
             isAvailable={product.is_available}
           />
 
-          {product.description && (
+          {safeDescription && (
             <div class="mt-4 sm:mt-6">
               <h2 class="font-semibold mb-1 sm:mb-2 text-sm sm:text-base" style="color:var(--cs-product-name)">Deskripsi</h2>
-              <p class="whitespace-pre-line text-sm sm:text-base leading-relaxed" style="color:var(--cs-detail-text)">{product.description}</p>
+              <ExpandableDescription client:load safeHtml={safeDescription} />
             </div>
           )}
 

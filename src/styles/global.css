@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 
 @layer base {
   a, button, [role="button"], input[type="submit"], input[type="button"], select, label[for] {
